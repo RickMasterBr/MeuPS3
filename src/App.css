@@ -1,0 +1,11 @@
+body{
+  margin: 0;
+  font-family: 'Webslinger', sans-serif;
+}
+@font-face {
+  font-family: 'Webslinger';
+  src: url('./assets/WebslingerBold-z8eEX.ttf') format('truetype');
+  font-weight: bold;
+  font-style: normal;
+}
+
