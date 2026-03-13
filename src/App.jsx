@@ -549,6 +549,100 @@ function DownloadPage() {
 
 }
 
+function Contato() {
+
+  return (
+
+    <div style={{ maxWidth: "700px" }}>
+
+      <h1>Contato</h1>
+
+      <p>Se tiver dúvidas ou sugestões sobre o site, envie uma mensagem.</p>
+
+      <form style={{ display: "flex", flexDirection: "column", gap: "15px", marginTop: "20px" }}>
+
+        <input
+          type="text"
+          placeholder="Seu nome"
+          style={{ padding: "10px", borderRadius: "6px", border: "none" }}
+        />
+
+        <input
+          type="email"
+          placeholder="Seu email"
+          style={{ padding: "10px", borderRadius: "6px", border: "none" }}
+        />
+
+        <textarea
+          placeholder="Sua mensagem"
+          rows="5"
+          style={{ padding: "10px", borderRadius: "6px", border: "none" }}
+        />
+
+        <button
+          style={{
+            background: "red",
+            border: "none",
+            padding: "12px",
+            color: "white",
+            fontWeight: "bold",
+            borderRadius: "6px",
+            cursor: "pointer"
+          }}
+        >
+          Enviar mensagem
+        </button>
+
+      </form>
+
+    </div>
+
+  )
+
+}
+
+function Sobre() {
+
+  return (
+
+    <div style={{ maxWidth: "800px" }}>
+
+      <h1>Sobre o MeuPS3</h1>
+
+      <p style={{ marginTop: "20px", lineHeight: "1.6" }}>
+
+        O MeuPS3 é um site dedicado ao PlayStation 3, com tutoriais,
+        downloads de homebrew, listas de jogos e guias para desbloqueio
+        do console.
+
+        O objetivo é centralizar informações úteis para a comunidade.
+
+      </p>
+
+    </div>
+
+  )
+
+}
+
+function NotFound() {
+
+  return (
+
+    <div>
+
+      <h1>404</h1>
+
+      <p>Página não encontrada.</p>
+
+      <Link to="/" style={{ color: "red" }}>Voltar para Home</Link>
+
+    </div>
+
+  )
+
+}
+
 function App() {
 
 
@@ -558,9 +652,34 @@ function App() {
 
       <div style={{ background: "#111", minHeight: "100vh", color: "white" }}>
 
-        <header style={{ background: "black", padding: "20px", borderBottom: "2px solid red" }}>
+        <header
+          style={{
+            background: "black",
+            padding: "20px",
+            borderBottom: "2px solid red",
+            display: "flex",
+            justifyContent: "space-between",
+            alignItems: "center"
+          }}
+        >
 
           <h1 style={{ margin: 0, color: "red" }}>MeuPS3</h1>
+
+          <nav style={{ display: "flex", gap: "20px" }}>
+
+            <NavLink to="/" style={{ color: "white", textDecoration: "none" }}>Home</NavLink>
+
+            <NavLink to="/jogos" style={{ color: "white", textDecoration: "none" }}>Jogos</NavLink>
+
+            <NavLink to="/tutoriais" style={{ color: "white", textDecoration: "none" }}>Tutoriais</NavLink>
+
+            <NavLink to="/downloads" style={{ color: "white", textDecoration: "none" }}>Downloads</NavLink>
+
+            <NavLink to="/contato" style={{ color: "white", textDecoration: "none" }}>Contato</NavLink>
+
+            <NavLink to="/sobre" style={{ color: "white", textDecoration: "none" }}>Sobre</NavLink>
+
+          </nav>
 
         </header>
 
@@ -653,11 +772,37 @@ function App() {
 
               <Route path="/jogo/:id" element={<Game />} />
 
+              <Route path="/contato" element={<Contato />} />
+
+              <Route path="/sobre" element={<Sobre />} />
+
+              <Route path="*" element={<NotFound />} />
+
             </Routes>
 
           </main>
 
         </div>
+
+        <footer
+          style={{
+            background: "#000",
+            marginTop: "40px",
+            padding: "20px",
+            textAlign: "center",
+            borderTop: "2px solid red"
+          }}
+        >
+
+          <p style={{ margin: 0 }}>
+            © {new Date().getFullYear()} MeuPS3
+          </p>
+
+          <p style={{ marginTop: 8, color: "#888" }}>
+            PlayStation 3 Community
+          </p>
+
+        </footer>
 
       </div>
 
