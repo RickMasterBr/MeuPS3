@@ -53,16 +53,108 @@ const games = [
   {
     id: "the-last-of-us",
     name: "The Last of Us",
-    image: "./src/assets/TLOU2.jpg",
+    image: "https://th.bing.com/th/id/OIP.0i7KLwJfCZIRbqocPqGPKQHaIf?w=156&h=180&c=7&r=0&o=7&pid=1.7&rm=3",
     genre: "Ação / Survival",
     size: "25GB"
   },
   {
-    id: "god-of-war-ragnarok",
-    name: "God of War Ragnarok",
-    image: "./src/assets/GOWR.jpg",
+    id: "god-of-war",
+    name: "God of War",
+    image: "https://th.bing.com/th/id/OIP.bpxOFTYdrmV5kYBy7-5N2gHaIe?w=144&h=180&c=7&r=0&o=7&pid=1.7&rm=3",
     genre: "Hack and Slash",
     size: "35GB"
+  },
+  {
+    id: "uncharted-3",
+    name: "Uncharted 3",
+    image: "https://tse1.mm.bing.net/th/id/OIP.mktX0_PL3tkW0zppHGQ2SwHaId?rs=1&pid=ImgDetMain&o=7&rm=3",
+    genre: "Ação / Aventura",
+    size: "20GB"
+  },
+  {
+    id: "red-dead-redemption",
+    name: "Red Dead Redemption",
+    image: "https://th.bing.com/th/id/OIP.k4eLrDpvAL6h3VX5qGrxQQHaIh?w=165&h=187&c=7&r=0&o=7&pid=1.7&rm=3",
+    genre: "Mundo aberto",
+    size: "8GB"
+  },
+  {
+    id: "metal-gear-solid-5",
+    name: "Metal Gear Solid 5",
+    image: "https://th.bing.com/th/id/OIP.m9ZHhJw1e71kMQW4UR2zDAHaIh?w=156&h=180&c=7&r=0&o=7&pid=1.7&rm=3",
+    genre: "Stealth / Ação",
+    size: "30GB"
+  },
+  {
+    id: "gta-rio",
+    name: "GTA Rio",
+    image: "https://tse4.mm.bing.net/th/id/OIP.KWEE37Vdr846niFX9TWMJQHaI6?rs=1&pid=ImgDetMain&o=7&rm=3",
+    genre: "Ação / Mundo aberto",
+    size: "12GB"
+  },
+  {
+    id: "call-of-duty",
+    name: "Call of Duty: Modern Warfare",
+    image: "https://th.bing.com/th/id/OIP.smQNIbvfIAH3M9UkpLLJtAHaIj?w=134&h=180&c=7&r=0&o=7&pid=1.7&rm=3",
+    genre: "FPS / Ação",
+    size: "40GB"
+  },
+  {
+    id: "assassins-creed",
+    name: "Assassin's Creed III",
+    image: "https://th.bing.com/th/id/OIP.vmgW6MlniK4KqyC5UF1n7wHaIf?w=150&h=180&c=7&r=0&o=7&pid=1.7&rm=3",
+    genre: "Ação / Aventura",
+    size: "28GB"
+  },
+  {
+    id: "dark-souls",
+    name: "Dark Souls",
+    image: "https://th.bing.com/th/id/OIP.eevt5XIZUaLQbpFh2Wvd_QHaIh?w=159&h=182&c=7&r=0&o=7&pid=1.7&rm=3",
+    genre: "RPG / Ação",
+    size: "15GB"
+  },
+  {
+    id: "minecraft",
+    name: "Minecraft",
+    image: "https://th.bing.com/th/id/OIP.vkbyuzg0ukdHSHwuEu-ikAHaIh?w=156&h=180&c=7&r=0&o=7&pid=1.7&rm=3",
+    genre: "Sandbox / Aventura",
+    size: "5GB"
+  },
+  {
+    id: "fifa-19",
+    name: "FIFA 19",
+    image: "https://th.bing.com/th/id/OIP.obMixmWtmRNV1aCmk-Ms6wHaHa?w=194&h=194&c=7&r=0&o=7&pid=1.7&rm=3",
+    genre: "Esporte",
+    size: "10GB"
+  },
+  {
+    id: "resident-evil",
+    name: "Resident Evil",
+    image: "https://th.bing.com/th/id/OIP.imYhf1MLc9xssIaxjdMntgHaIj?w=175&h=202&c=7&r=0&o=7&pid=1.7&rm=3",
+    genre: "Survival Horror",
+    size: "22GB"
+  },
+  {
+    id: "little-big-planet-3",
+    name: "Little Big Planet 3",
+    image: "https://th.bing.com/th/id/OIP.nLbtSUx8yzP4oM2FeNwVLgHaIj?w=128&h=180&c=7&r=0&o=7&pid=1.7&rm=3",
+    genre: "Plataforma / Criativo",
+    size: "8GB"
+  }
+]
+
+const popularGames = [
+  {
+    name: "GTA VI",
+    id: "gta-vi"
+  },
+  {
+    name: "The Last of Us",
+    id: "the-last-of-us"
+  },
+  {
+    name: "God of War Ragnarok",
+    id: "god-of-war-ragnarok"
   }
 ]
 
@@ -88,6 +180,7 @@ function Card({id, title, image, category}){
     </Link>
   )
 }
+
 
 // Páginas (Telas)
 
@@ -141,14 +234,20 @@ function Home() {
 }
 
 function Jogos() {
+
+  const [search, setSearch] = useState("")
+  const filteredGames = games.filter(game => game.name.toLowerCase().includes(search.toLowerCase()))
+
   return (
     <div>
 
       <h1>Jogos de PS3</h1>
 
+      <input type="text" placeholder="Buscar jogo..." value={search} onChange={(e) => setSearch(e.target.value)} style={{marginTop:"20px", padding:"10px", width:"300px", borderRadius:"6px", border:"none", outline:"none"}}/>
+
       <div style={{display:"flex", gap:"20px", flexWrap:"wrap", marginTop:"20px"}}>
 
-        {games.map((game, i) => (
+        {filteredGames.map((game, i) => (
           <Link key={i} to={`/jogo/${game.id}`} style={{textDecoration:"none", color:"white"}}>
 
             <div style={{width:"200px", background:"#1c1c1c", borderRadius:"8px", overflow:"hidden"}}>
@@ -283,6 +382,22 @@ function App() {
               <li style={{ padding: "8px 0" }}>
                 <Link to="/downloads" style={{ color: "white", textDecoration: "none" }}>Downloads</Link>
               </li>
+
+            </ul>
+
+            <h3 style={{margintTop:"30px"}}>🔥 Jogos populares</h3>
+
+            <ul style={{listStyle:"none", padding:0}}>
+
+              {popularGames.map((game, i) =>(
+
+                <li key={i} style={{padding:"6px 0"}}>
+
+                  <Link to={`/jogo/${game.id}`} style={{color:"#ccc", textDecoration:"none"}}>{game.name}</Link>
+
+                </li>
+
+              ))}
 
             </ul>
 
