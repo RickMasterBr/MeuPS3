@@ -153,8 +153,35 @@ const popularGames = [
     id: "the-last-of-us"
   },
   {
-    name: "God of War Ragnarok",
-    id: "god-of-war-ragnarok"
+    name: "God of War",
+    id: "god-of-war"
+  }
+]
+
+const downloadList = [
+  {
+    id: "multiman",
+    name: "MultiMAN v4.85",
+    type: "Homebrew",
+    size: "35 MB"
+  },
+  {
+    id: "webman",
+    name: "WebMAN Mod",
+    type: "Plugin",
+    size: "2 MB"
+  },
+  {
+    id: "hen",
+    name: "PS3 HEN (Última Versão)",
+    type: "Exploit",
+    size: "15 MB"
+  },
+  {
+    id: "pkgi",
+    name: "PKGi PS3",
+    type: "Loja Homebrew",
+    size: "8 MB"
   }
 ]
 
@@ -189,13 +216,11 @@ function Home() {
   const [index, setIndex] = useState(0)
 
   useEffect(() => {
-
     const interval = setInterval(() => {
-
       setIndex((prev) => (prev + 1) % slides.length)
-
     }, 4000)
-
+  
+    return () => clearInterval(interval)
   }, [])
 
   return (
@@ -272,21 +297,82 @@ function Jogos() {
 }
 
 function Tutoriais() {
+
+  const [search, setSearch] = useState("")
+
+  const filteredPosts = posts.filter(post => post.title.toLowerCase().includes(search.toLowerCase()))
+
   return (
     <div>
 
-      <h2>Tutorias de PS3</h2>
+      <h1>Tutorias de PS3</h1>
+
+      <input type="text" placeholder="Buscar tutorial..." value={search} onChange={(e) => setSearch(e.target.value)} style={{marginTop:"20px", padding:"10px", width:"300px", borderRadius:"6px", border:"none", outline:"none"}}/>
+
+      <div style={{display:"flex", gap:"20px", flexWrap:"wrap", marginTop:"20px"}}>
+
+        {filteredPosts.length > 0 ? (
+          filteredPosts.map((post,i) => (
+            <Card key={i} id={posts.indexOf(post)} title={post.title} image={post.image} category={post.category}/>
+          ))
+        ) : (
+          <p>Nenhum tutorial encontrado</p>
+        )}
+
+      </div>
 
     </div>
   )
 }
 
 function Downloads() {
+  const [search, setSearch] = useState("")
+  
+  // Filtra os downloads
+  const filteredDownloads = downloadList.filter(item => 
+    item.name.toLowerCase().includes(search.toLowerCase())
+  )
+
+  const handleDownload = (nome) => {
+    alert(`A iniciar o download de: ${nome}`)
+    // No futuro, aqui podes colocar a lógica real de download (window.open, etc)
+  }
+
   return (
     <div>
+      <h1>Downloads de PS3</h1>
 
-      <h2>Downloads de PS3</h2>
+      <input 
+        type="text" 
+        placeholder="Buscar ficheiro..." 
+        value={search} 
+        onChange={(e) => setSearch(e.target.value)} 
+        style={{marginTop:"20px", padding:"10px", width:"300px", borderRadius:"6px", border:"none", outline:"none"}}
+      />
 
+      <div style={{marginTop: "30px", display: "flex", flexDirection: "column", gap: "15px"}}>
+        {filteredDownloads.length > 0 ? (
+          filteredDownloads.map((item, i) => (
+            <div key={i} style={{background: "#1c1c1c", padding: "15px", borderRadius: "8px", display: "flex", justifyContent: "space-between", alignItems: "center"}}>
+              
+              <div>
+                <h3 style={{margin: 0, fontSize: "18px"}}>{item.name}</h3>
+                <p style={{margin: "5px 0 0 0", fontSize: "14px", color: "#ccc"}}>{item.type} • {item.size}</p>
+              </div>
+
+              <button 
+                onClick={() => handleDownload(item.name)}
+                style={{background: "red", color: "white", border: "none", padding: "10px 20px", borderRadius: "5px", cursor: "pointer", fontWeight: "bold"}}
+              >
+                Baixar
+              </button>
+
+            </div>
+          ))
+        ) : (
+          <p>Nenhum ficheiro encontrado.</p>
+        )}
+      </div>
     </div>
   )
 }
@@ -385,7 +471,7 @@ function App() {
 
             </ul>
 
-            <h3 style={{margintTop:"30px"}}>🔥 Jogos populares</h3>
+            <h3 style={{marginTop:"30px"}}>🔥 Jogos populares</h3>
 
             <ul style={{listStyle:"none", padding:0}}>
 
