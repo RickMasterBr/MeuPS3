@@ -1,727 +1,609 @@
-import { BrowserRouter, Routes, Route, Link, useParams, NavLink } from "react-router-dom"
-import { useState, useEffect } from "react"
-import { Carousel } from "react-responsive-carousel"
-import "react-responsive-carousel/lib/styles/carousel.min.css"
+import { BrowserRouter, Link, NavLink, Route, Routes, useLocation, useNavigate, useParams } from 'react-router-dom'
+import { useEffect, useMemo, useRef, useState } from 'react'
+import './App.css'
 
+const icons = {
+  home: (
+    <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 10.5 12 3l9 7.5"/><path d="M5 9.5V21h14V9.5"/></svg>
+  ),
+  gamepad: (
+    <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6.5 9h11a4.5 4.5 0 0 1 4.43 5.28l-.75 4.12a2.5 2.5 0 0 1-3.94 1.55l-2.54-1.82a3 3 0 0 0-3.4 0L8.76 20a2.5 2.5 0 0 1-3.94-1.55l-.75-4.12A4.5 4.5 0 0 1 8.5 9Z"/><path d="M8 12.5v3"/><path d="M6.5 14h3"/><circle cx="16.5" cy="13" r=".75" fill="currentColor" stroke="none"/><circle cx="18.5" cy="15" r=".75" fill="currentColor" stroke="none"/></svg>
+  ),
+  download: (
+    <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3v12"/><path d="m7 10 5 5 5-5"/><path d="M5 21h14"/></svg>
+  ),
+  book: (
+    <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v19H6.5A2.5 2.5 0 0 1 4 18.5v-14A2.5 2.5 0 0 1 6.5 2Z"/></svg>
+  ),
+  search: (
+    <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
+  ),
+  play: (
+    <svg viewBox="0 0 24 24" aria-hidden="true"><path d="m8 5 11 7-11 7z" fill="currentColor" stroke="none"/></svg>
+  ),
+  hardDrive: (
+    <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 15h16l-1.5-8h-13Z"/><path d="M5 15v3a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-3"/><path d="M8 18h.01"/><path d="M12 18h.01"/></svg>
+  ),
+  file: (
+    <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M14 2H7a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V7Z"/><path d="M14 2v5h5"/></svg>
+  ),
+  cpu: (
+    <svg viewBox="0 0 24 24" aria-hidden="true"><rect x="7" y="7" width="10" height="10" rx="2"/><path d="M10 1v4M14 1v4M10 19v4M14 19v4M19 10h4M19 14h4M1 10h4M1 14h4"/></svg>
+  ),
+  tag: (
+    <svg viewBox="0 0 24 24" aria-hidden="true"><path d="m20.59 13.41-7.18 7.18a2 2 0 0 1-2.82 0L3 13V3h10l7.59 7.59a2 2 0 0 1 0 2.82Z"/><circle cx="8.5" cy="8.5" r="1" fill="currentColor" stroke="none"/></svg>
+  ),
+  x: (
+    <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M18 6 6 18M6 6l12 12"/></svg>
+  ),
+  chevronLeft: (
+    <svg viewBox="0 0 24 24" aria-hidden="true"><path d="m15 18-6-6 6-6"/></svg>
+  ),
+  chevronRight: (
+    <svg viewBox="0 0 24 24" aria-hidden="true"><path d="m9 18 6-6-6-6"/></svg>
+  ),
+}
 
-import "./App.css"
-
-// Componentes
-
-const slides = [
+const heroSlides = [
   {
-    title: "Como Desbloquear PS3 com HEN",
-    image: "https://i.ytimg.com/vi/uNZEg2G8F1Q/maxresdefault.jpg"
+    id: 'hen',
+    title: 'COMO INSTALAR HEN',
+    subtitle: 'Guia completo para desbloquear, ativar homebrew e preparar o seu PS3 com segurança.',
+    image: 'https://images.unsplash.com/photo-1511512578047-dfb367046420?auto=format&fit=crop&w=1600&q=80',
+    primaryLabel: 'Ver Tutorial',
+    secondaryLabel: 'Ler Artigo',
+    route: '/post/instalar-hen',
   },
   {
-    title: "Top 10 Jogos de PS3",
-    image: "https://sm.ign.com/t/ign_br/articlepage/i/igns-top-2/igns-top-25-playstation-3-games_zd4a.1280.jpg"
+    id: 'tlou',
+    title: 'THE LAST OF US',
+    subtitle: 'Página premium com specs, screenshots, trailer e download destacado.',
+    image: 'https://images.unsplash.com/photo-1542751371-adc38448a05e?auto=format&fit=crop&w=1600&q=80',
+    primaryLabel: 'Abrir Jogo',
+    secondaryLabel: 'Explorar Coleção',
+    route: '/jogo/the-last-of-us',
   },
   {
-    title: "Instalar Multiman no PS3",
-    image: "https://www.bing.com/th?id=OIP.bIhrS5NX5oto78HE3gZSIAHaEK"
-  }
+    id: 'multiman',
+    title: 'MULTIMAN & FERRAMENTAS',
+    subtitle: 'Downloads rápidos, utilitários e organização moderna em uma home estilo console.',
+    image: 'https://images.unsplash.com/photo-1493711662062-fa541adb3fc8?auto=format&fit=crop&w=1600&q=80',
+    primaryLabel: 'Ver Downloads',
+    secondaryLabel: 'Ler Artigo',
+    route: '/downloads',
+  },
 ]
 
 const posts = [
   {
-    id: "instalar-hen",
-    title: "Como instalar HEN no PS3",
-    image: "https://th.bing.com/th/id/OIP.Q714dDPmhYQ1KcgLJpcgIwHaEK",
-    category: "Tutorial",
-    video: "https://www.youtube.com/embed/uNZEg2G8F1Q",
-    content: `
-    O PS3 HEN permite executar homebrew no PlayStation 3.
-
-    PASSO 1
-    Atualize o PS3 para o firmware correto.
-
-    PASSO 2
-    Acesse o navegador do PS3.
-
-    PASSO 3
-    Execute o exploit HEN.
-
-    PASSO 4
-    Instale o pacote HEN.
-
-    Após isso o console estará desbloqueado.
-    `
+    id: 'instalar-hen',
+    title: 'Como instalar HEN no PS3',
+    kicker: 'Tutorial principal',
+    image: heroSlides[0].image,
+    category: 'Tutorial',
+    video: 'https://www.youtube.com/embed/uNZEg2G8F1Q?rel=0',
+    content: 'Atualize o firmware compatível, use o navegador do PS3 para abrir o exploit, ative o instalador e finalize a configuração do HEN para liberar homebrew, backups e utilitários.',
   },
-
   {
-    id: "instalar-multiman",
-    title: "Como instalar MultiMAN",
-    image: "https://www.bing.com/th?id=OIP.bIhrS5NX5oto78HE3gZSIAHaEK",
-    category: "Tutorial",
-    video: "https://www.youtube.com/embed/uNZEg2G8F1Q",
-    content: `
-    O MultiMAN é o gerenciador de jogos mais popular do PS3.
-
-    PASSO 1
-    Baixe o arquivo PKG.
-
-    PASSO 2
-    Copie para um pendrive.
-
-    PASSO 3
-    No PS3 vá em Install Package Files.
-
-    PASSO 4
-    Execute o MultiMAN.
-
-    Agora você poderá gerenciar seus jogos.
-    `
-  }
+    id: 'instalar-multiman',
+    title: 'Como instalar MultiMAN',
+    kicker: 'Gestão de backups',
+    image: 'https://images.unsplash.com/photo-1606144042614-b2417e99c4e3?auto=format&fit=crop&w=1200&q=80',
+    category: 'Tutorial',
+    video: 'https://www.youtube.com/embed/uNZEg2G8F1Q?rel=0',
+    content: 'Baixe o PKG, copie para o pendrive, instale pelo menu Install Package Files e organize suas ISOs, covers e atalhos.',
+  },
 ]
 
 const games = [
   {
-
-    id: "gta-vi",
-    name: "Grand Theft Auto VI",
-    image: "https://th.bing.com/th/id/R.1316de060b4f86a8b8019c0f94a33edb?rik=4wn9Z0E82BLTWQ&riu=http%3a%2f%2fwww.siradio.fm%2fupload%2fimages%2fgtasix.jpg&ehk=FVyrszz179KfCa9SkMSo%2bEPrABfSxRZS3ppfiEQvG4Y%3d&risl=&pid=ImgRaw&r=0",
-    genre: "Ação / Mundo aberto",
-    size: "18GB"
+    id: 'the-last-of-us',
+    name: 'The Last of Us',
+    image: 'https://images.unsplash.com/photo-1511882150382-421056c89033?auto=format&fit=crop&w=900&q=80',
+    preview: 'https://media.giphy.com/media/3o7TKsQ8UQNjQH8d2U/giphy.gif',
+    backdrop: 'https://images.unsplash.com/photo-1542751371-adc38448a05e?auto=format&fit=crop&w=1600&q=80',
+    genre: 'Ação / Survival',
+    tags: ['Ação', 'Narrativa', 'Survival'],
+    size: '25 GB',
+    format: 'PKG',
+    firmware: '4.85+',
+    category: 'Novidades',
+    downloads: '1.2M',
+    description: 'Viaje por uma América devastada em uma aventura cinematográfica marcada por combate tenso, stealth e narrativa emocional.',
+    screenshots: [
+      'https://images.unsplash.com/photo-1493711662062-fa541adb3fc8?auto=format&fit=crop&w=1200&q=80',
+      'https://images.unsplash.com/photo-1486572788966-cfd3df1f5b42?auto=format&fit=crop&w=1200&q=80',
+      'https://images.unsplash.com/photo-1511512578047-dfb367046420?auto=format&fit=crop&w=1200&q=80',
+    ],
+    trailer: 'https://www.youtube.com/embed/W01L70IGBgE?rel=0',
   },
   {
-    id: "the-last-of-us",
-    name: "The Last of Us",
-    image: "https://th.bing.com/th/id/OIP.0i7KLwJfCZIRbqocPqGPKQHaIf?w=156&h=180&c=7&r=0&o=7&pid=1.7&rm=3",
-    genre: "Ação / Survival",
-    size: "25GB"
+    id: 'god-of-war',
+    name: 'God of War Ascension',
+    image: 'https://images.unsplash.com/photo-1509198397868-475647b2a1e5?auto=format&fit=crop&w=900&q=80',
+    preview: 'https://media.giphy.com/media/l0HlNQ03J5JxX6lva/giphy.gif',
+    backdrop: 'https://images.unsplash.com/photo-1526379095098-d400fd0bf935?auto=format&fit=crop&w=1600&q=80',
+    genre: 'Hack and Slash',
+    tags: ['Mitologia', 'Hack and Slash', 'Boss Fights'],
+    size: '35 GB',
+    format: 'ISO',
+    firmware: '4.86+',
+    category: 'Mais baixados',
+    downloads: '940K',
+    description: 'Kratos retorna com escala épica, arenas brutais e combates velozes para quem procura espetáculo puro.',
+    screenshots: [
+      'https://images.unsplash.com/photo-1514858280850-953a5f1f1f40?auto=format&fit=crop&w=1200&q=80',
+      'https://images.unsplash.com/photo-1511882150382-421056c89033?auto=format&fit=crop&w=1200&q=80',
+      'https://images.unsplash.com/photo-1606144042614-b2417e99c4e3?auto=format&fit=crop&w=1200&q=80',
+    ],
+    trailer: 'https://www.youtube.com/embed/BJ0o7rP6Idk?rel=0',
   },
   {
-    id: "god-of-war",
-    name: "God of War",
-    image: "https://th.bing.com/th/id/OIP.bpxOFTYdrmV5kYBy7-5N2gHaIe?w=144&h=180&c=7&r=0&o=7&pid=1.7&rm=3",
-    genre: "Hack and Slash",
-    size: "35GB"
+    id: 'red-dead-redemption',
+    name: 'Red Dead Redemption',
+    image: 'https://images.unsplash.com/photo-1517466787929-bc90951d0974?auto=format&fit=crop&w=900&q=80',
+    preview: 'https://media.giphy.com/media/26ufdipQqU2lhNA4g/giphy.gif',
+    backdrop: 'https://images.unsplash.com/photo-1500530855697-b586d89ba3ee?auto=format&fit=crop&w=1600&q=80',
+    genre: 'Mundo aberto',
+    tags: ['Velho Oeste', 'Open World', 'Aventura'],
+    size: '8 GB',
+    format: 'Folder / ISO',
+    firmware: '4.84+',
+    category: 'RPG',
+    downloads: '820K',
+    description: 'Explore desertos, caçadas, duelos e missões lendárias em uma das experiências de mundo aberto mais marcantes do PS3.',
+    screenshots: [
+      'https://images.unsplash.com/photo-1472396961693-142e6e269027?auto=format&fit=crop&w=1200&q=80',
+      'https://images.unsplash.com/photo-1500534314209-a25ddb2bd429?auto=format&fit=crop&w=1200&q=80',
+      'https://images.unsplash.com/photo-1517466787929-bc90951d0974?auto=format&fit=crop&w=1200&q=80',
+    ],
+    trailer: 'https://www.youtube.com/embed/-o7rES_3ymA?rel=0',
   },
   {
-    id: "uncharted-3",
-    name: "Uncharted 3",
-    image: "https://tse1.mm.bing.net/th/id/OIP.mktX0_PL3tkW0zppHGQ2SwHaId?rs=1&pid=ImgDetMain&o=7&rm=3",
-    genre: "Ação / Aventura",
-    size: "20GB"
+    id: 'dark-souls',
+    name: 'Dark Souls',
+    image: 'https://images.unsplash.com/photo-1534423861386-85a16f5d13fd?auto=format&fit=crop&w=900&q=80',
+    preview: 'https://media.giphy.com/media/l0MYB8Ory7Hqefo9a/giphy.gif',
+    backdrop: 'https://images.unsplash.com/photo-1506744038136-46273834b3fb?auto=format&fit=crop&w=1600&q=80',
+    genre: 'RPG / Ação',
+    tags: ['RPG', 'Soulslike', 'Desafio'],
+    size: '15 GB',
+    format: 'PKG',
+    firmware: '4.85+',
+    category: 'RPG',
+    downloads: '610K',
+    description: 'Sistema de progressão profundo, cenários opressivos e chefes brutais para quem quer dominar cada detalhe.',
+    screenshots: [
+      'https://images.unsplash.com/photo-1501785888041-af3ef285b470?auto=format&fit=crop&w=1200&q=80',
+      'https://images.unsplash.com/photo-1500530855697-b586d89ba3ee?auto=format&fit=crop&w=1200&q=80',
+      'https://images.unsplash.com/photo-1534423861386-85a16f5d13fd?auto=format&fit=crop&w=1200&q=80',
+    ],
+    trailer: 'https://www.youtube.com/embed/o1780AqAa20?rel=0',
   },
   {
-    id: "red-dead-redemption",
-    name: "Red Dead Redemption",
-    image: "https://th.bing.com/th/id/OIP.k4eLrDpvAL6h3VX5qGrxQQHaIh?w=165&h=187&c=7&r=0&o=7&pid=1.7&rm=3",
-    genre: "Mundo aberto",
-    size: "8GB"
+    id: 'uncharted-3',
+    name: 'Uncharted 3',
+    image: 'https://images.unsplash.com/photo-1511512578047-dfb367046420?auto=format&fit=crop&w=900&q=80',
+    preview: 'https://media.giphy.com/media/3oEjI6SIIHBdRxXI40/giphy.gif',
+    backdrop: 'https://images.unsplash.com/photo-1522199755839-a2bacb67c546?auto=format&fit=crop&w=1600&q=80',
+    genre: 'Ação / Aventura',
+    tags: ['Aventura', 'Cinemático', 'Exploração'],
+    size: '20 GB',
+    format: 'ISO',
+    firmware: '4.82+',
+    category: 'Novidades',
+    downloads: '700K',
+    description: 'Set pieces cinematográficos, puzzles e perseguições explosivas fazem deste clássico uma vitrine do PS3.',
+    screenshots: [
+      'https://images.unsplash.com/photo-1500534314209-a25ddb2bd429?auto=format&fit=crop&w=1200&q=80',
+      'https://images.unsplash.com/photo-1522199755839-a2bacb67c546?auto=format&fit=crop&w=1200&q=80',
+      'https://images.unsplash.com/photo-1511512578047-dfb367046420?auto=format&fit=crop&w=1200&q=80',
+    ],
+    trailer: 'https://www.youtube.com/embed/DzfpyUB60YY?rel=0',
   },
-  {
-    id: "metal-gear-solid-5",
-    name: "Metal Gear Solid 5",
-    image: "https://th.bing.com/th/id/OIP.m9ZHhJw1e71kMQW4UR2zDAHaIh?w=156&h=180&c=7&r=0&o=7&pid=1.7&rm=3",
-    genre: "Stealth / Ação",
-    size: "30GB"
-  },
-  {
-    id: "gta-rio",
-    name: "GTA Rio",
-    image: "https://tse4.mm.bing.net/th/id/OIP.KWEE37Vdr846niFX9TWMJQHaI6?rs=1&pid=ImgDetMain&o=7&rm=3",
-    genre: "Ação / Mundo aberto",
-    size: "12GB"
-  },
-  {
-    id: "call-of-duty",
-    name: "Call of Duty: Modern Warfare",
-    image: "https://th.bing.com/th/id/OIP.smQNIbvfIAH3M9UkpLLJtAHaIj?w=134&h=180&c=7&r=0&o=7&pid=1.7&rm=3",
-    genre: "FPS / Ação",
-    size: "40GB"
-  },
-  {
-    id: "assassins-creed",
-    name: "Assassin's Creed III",
-    image: "https://th.bing.com/th/id/OIP.vmgW6MlniK4KqyC5UF1n7wHaIf?w=150&h=180&c=7&r=0&o=7&pid=1.7&rm=3",
-    genre: "Ação / Aventura",
-    size: "28GB"
-  },
-  {
-    id: "dark-souls",
-    name: "Dark Souls",
-    image: "https://th.bing.com/th/id/OIP.eevt5XIZUaLQbpFh2Wvd_QHaIh?w=159&h=182&c=7&r=0&o=7&pid=1.7&rm=3",
-    genre: "RPG / Ação",
-    size: "15GB"
-  },
-  {
-    id: "minecraft",
-    name: "Minecraft",
-    image: "https://th.bing.com/th/id/OIP.vkbyuzg0ukdHSHwuEu-ikAHaIh?w=156&h=180&c=7&r=0&o=7&pid=1.7&rm=3",
-    genre: "Sandbox / Aventura",
-    size: "5GB"
-  },
-  {
-    id: "fifa-19",
-    name: "FIFA 19",
-    image: "https://th.bing.com/th/id/OIP.obMixmWtmRNV1aCmk-Ms6wHaHa?w=194&h=194&c=7&r=0&o=7&pid=1.7&rm=3",
-    genre: "Esporte",
-    size: "10GB"
-  },
-  {
-    id: "resident-evil",
-    name: "Resident Evil",
-    image: "https://th.bing.com/th/id/OIP.imYhf1MLc9xssIaxjdMntgHaIj?w=175&h=202&c=7&r=0&o=7&pid=1.7&rm=3",
-    genre: "Survival Horror",
-    size: "22GB"
-  },
-  {
-    id: "little-big-planet-3",
-    name: "Little Big Planet 3",
-    image: "https://th.bing.com/th/id/OIP.nLbtSUx8yzP4oM2FeNwVLgHaIj?w=128&h=180&c=7&r=0&o=7&pid=1.7&rm=3",
-    genre: "Plataforma / Criativo",
-    size: "8GB"
-  }
 ]
 
-const popularGames = [
-  {
-    name: "GTA VI",
-    id: "gta-vi"
-  },
-  {
-    name: "The Last of Us",
-    id: "the-last-of-us"
-  },
-  {
-    name: "God of War",
-    id: "god-of-war"
-  }
+const downloads = [
+  { id: 'multiman', name: 'MultiMAN v4.85', type: 'Homebrew', size: '35 MB' },
+  { id: 'webman', name: 'WebMAN Mod', type: 'Plugin', size: '2 MB' },
+  { id: 'hen-file', name: 'PS3 HEN', type: 'Exploit', size: '15 MB' },
+  { id: 'pkgi', name: 'PKGi PS3', type: 'Loja Homebrew', size: '8 MB' },
 ]
 
-const downloadList = [
-  {
-    id: "multiman",
-    name: "MultiMAN v4.85",
-    type: "Homebrew",
-    size: "35 MB",
-    url: "https://example.com/multiman.pkg"
-  },
-  {
-    id: "webman",
-    name: "WebMAN Mod",
-    type: "Plugin",
-    size: "2 MB",
-    url: "https://example.com/webman.pkg"
-  },
-  {
-    id: "hen",
-    name: "PS3 HEN (Última Versão)",
-    type: "Exploit",
-    size: "15 MB",
-    url: "https://example.com/hen.pkg"
-  },
-  {
-    id: "pkgi",
-    name: "PKGi PS3",
-    type: "Loja Homebrew",
-    size: "8 MB",
-    url: "https://example.com/pkgi.pkg"
-  }
+const navItems = [
+  { to: '/', label: 'Home', icon: 'home' },
+  { to: '/jogo/the-last-of-us', label: 'Jogos', icon: 'gamepad' },
+  { to: '/downloads', label: 'Downloads', icon: 'download' },
+  { to: '/post/instalar-hen', label: 'Tutoriais', icon: 'book' },
 ]
 
-function Card({ id, title, image, category }) {
+function App() {
   return (
-    <Link to={`/post/${id}`}>
-      <div style={{
-        width: "250px",
-        background: "var(--bg-card)",
-        border: "1px solid var(--border)",
-        borderBottom: "2px solid var(--accent2)",
-        overflow: "hidden",
-        clipPath: "polygon(0 0, calc(100% - 12px) 0, 100% 12px, 100% 100%, 12px 100%, 0 calc(100% - 12px))",
-        transition: "transform 0.2s, box-shadow 0.2s",
-        cursor: "pointer"
-      }}
-        onMouseEnter={e => {
-          e.currentTarget.style.transform = "translateY(-4px)"
-          e.currentTarget.style.boxShadow = "0 0 20px var(--glow2)"
-        }}
-        onMouseLeave={e => {
-          e.currentTarget.style.transform = "translateY(0)"
-          e.currentTarget.style.boxShadow = "none"
-        }}
-      >
-        <img src={image} style={{ width: "100%", height: "150px", objectFit: "cover", display: "block" }} />
-        <div style={{ padding: "12px" }}>
-          <p style={{ fontSize: "10px", color: "var(--accent2)", letterSpacing: "3px", marginBottom: "6px" }}>
-            {category.toUpperCase()}
-          </p>
-          <h3 style={{ fontSize: "14px", color: "var(--text)", letterSpacing: "1px" }}>{title}</h3>
+    <BrowserRouter>
+      <Shell />
+    </BrowserRouter>
+  )
+}
+
+function Shell() {
+  const location = useLocation()
+  const navigate = useNavigate()
+  const [commandOpen, setCommandOpen] = useState(false)
+  const [commandQuery, setCommandQuery] = useState('')
+  const [lightbox, setLightbox] = useState(null)
+
+  useEffect(() => {
+    const handler = (event) => {
+      if ((event.ctrlKey || event.metaKey) && event.key.toLowerCase() === 'k') {
+        event.preventDefault()
+        setCommandOpen(true)
+      }
+      if (event.key === 'Escape') {
+        setCommandOpen(false)
+        setLightbox(null)
+      }
+    }
+    window.addEventListener('keydown', handler)
+    return () => window.removeEventListener('keydown', handler)
+  }, [])
+
+  const commandItems = useMemo(() => {
+    const base = [
+      ...games.map((game) => ({ type: 'Jogo', title: game.name, subtitle: game.genre, to: `/jogo/${game.id}` })),
+      ...posts.map((post) => ({ type: 'Tutorial', title: post.title, subtitle: post.category, to: `/post/${post.id}` })),
+      ...downloads.map((item) => ({ type: 'Download', title: item.name, subtitle: `${item.type} • ${item.size}`, to: '/downloads' })),
+    ]
+    const query = commandQuery.trim().toLowerCase()
+    return query
+      ? base.filter((item) => `${item.title} ${item.subtitle} ${item.type}`.toLowerCase().includes(query))
+      : base.slice(0, 8)
+  }, [commandQuery])
+
+  return (
+    <div className="app-shell">
+      <Header onOpenCommand={() => setCommandOpen(true)} />
+      <main key={location.pathname} className="page-shell route-fade">
+          <Routes>
+            <Route path="/" element={<HomePage />} />
+            <Route path="/jogo/:id" element={<GamePage onOpenLightbox={setLightbox} />} />
+            <Route path="/post/:id" element={<PostPage />} />
+            <Route path="/downloads" element={<DownloadsPage />} />
+          </Routes>
+        </main>
+
+      {commandOpen && (
+        <CommandPalette
+          query={commandQuery}
+          setQuery={setCommandQuery}
+          items={commandItems}
+          onClose={() => setCommandOpen(false)}
+          onSelect={(to) => { setCommandOpen(false); setCommandQuery(''); navigate(to) }}
+        />
+      )}
+
+      {lightbox && (
+        <Lightbox image={lightbox} onClose={() => setLightbox(null)} />
+      )}
+    </div>
+  )
+}
+
+function Header({ onOpenCommand }) {
+  return (
+    <header className="floating-header">
+      <Link to="/" className="brand-mark">MEUPS3</Link>
+      <nav className="header-nav">
+        {navItems.map((item) => (
+          <NavLink key={item.to} to={item.to} className={({ isActive }) => `nav-link ${isActive ? 'active' : ''}`}>
+            <span className="icon">{icons[item.icon]}</span>
+            <span>{item.label}</span>
+          </NavLink>
+        ))}
+      </nav>
+      <button type="button" className="command-trigger" onClick={onOpenCommand}>
+        <span className="icon">{icons.search}</span>
+        <span>Buscar</span>
+        <kbd>Ctrl+K</kbd>
+      </button>
+    </header>
+  )
+}
+
+function HomePage() {
+  return (
+    <div className="home-page">
+      <HeroCarousel />
+      <RevealSection>
+        <section className="section-block">
+          <div className="section-heading">
+            <span className="eyebrow">Destaques</span>
+            <h2>Bento grid editorial com foco no que importa.</h2>
+          </div>
+          <BentoGrid />
+        </section>
+      </RevealSection>
+      <RevealSection>
+        <section className="section-block">
+          <div className="section-heading">
+            <span className="eyebrow">Trilhos</span>
+            <h2>Jogos organizados em faixas horizontais estilo console.</h2>
+          </div>
+          <GameRail title="Novidades" items={games.filter((game) => game.category === 'Novidades')} />
+          <GameRail title="RPG" items={games.filter((game) => game.category === 'RPG')} />
+          <GameRail title="Mais Baixados" items={games.filter((game) => game.category === 'Mais baixados')} />
+        </section>
+      </RevealSection>
+    </div>
+  )
+}
+
+function HeroCarousel() {
+  const [index, setIndex] = useState(0)
+  useEffect(() => {
+    const timer = window.setInterval(() => {
+      setIndex((current) => (current + 1) % heroSlides.length)
+    }, 5000)
+    return () => window.clearInterval(timer)
+  }, [])
+
+  return (
+    <section className="hero-carousel">
+      {heroSlides.map((slide, slideIndex) => (
+        <article
+          key={slide.id}
+          className={`hero-slide ${slideIndex === index ? 'active' : ''}`}
+          style={{ backgroundImage: `linear-gradient(180deg, rgba(9,9,12,0.15), rgba(9,9,12,0.92)), url(${slide.image})` }}
+        >
+          <div className="hero-content">
+            <span className="eyebrow">Playstation 3 reimaginado</span>
+            <h1>{slide.title}</h1>
+            <p>{slide.subtitle}</p>
+            <div className="hero-actions">
+              <Link to={slide.route} className="primary-btn"><span className="icon">{icons.play}</span>{slide.primaryLabel}</Link>
+              <Link to={slide.route} className="secondary-btn">{slide.secondaryLabel}</Link>
+            </div>
+          </div>
+        </article>
+      ))}
+      <div className="hero-pagination">
+        {heroSlides.map((slide, slideIndex) => (
+          <button key={slide.id} type="button" className={slideIndex === index ? 'active' : ''} onClick={() => setIndex(slideIndex)} />
+        ))}
+      </div>
+    </section>
+  )
+}
+
+function BentoGrid() {
+  const leadPost = posts[0]
+  const sideGames = games.slice(0, 2)
+  return (
+    <div className="bento-grid">
+      <Link to={`/post/${leadPost.id}`} className="bento-card bento-main" style={{ backgroundImage: `linear-gradient(180deg, rgba(9,9,12,0.05), rgba(9,9,12,0.85)), url(${leadPost.image})` }}>
+        <span className="pill">{leadPost.category}</span>
+        <h3>{leadPost.title}</h3>
+        <p>{leadPost.content}</p>
+      </Link>
+      {sideGames.map((game) => (
+        <Link key={game.id} to={`/jogo/${game.id}`} className="bento-card bento-side" style={{ backgroundImage: `linear-gradient(180deg, rgba(9,9,12,0.15), rgba(9,9,12,0.85)), url(${game.image})` }}>
+          <span className="pill">Popular</span>
+          <h3>{game.name}</h3>
+          <p>{game.genre}</p>
+        </Link>
+      ))}
+      {downloads.slice(0, 3).map((item) => (
+        <Link key={item.id} to="/downloads" className="bento-card bento-download">
+          <span className="icon">{icons.download}</span>
+          <strong>{item.name}</strong>
+          <span>{item.size}</span>
+        </Link>
+      ))}
+    </div>
+  )
+}
+
+function GameRail({ title, items }) {
+  return (
+    <div className="rail-wrapper">
+      <div className="rail-header">
+        <h3>{title}</h3>
+        <span>{items.length} títulos</span>
+      </div>
+      <div className="rail-track">
+        {items.map((game) => <GameCard key={game.id} game={game} />)}
+      </div>
+    </div>
+  )
+}
+
+function GameCard({ game }) {
+  const [hovered, setHovered] = useState(false)
+  return (
+    <Link
+      to={`/jogo/${game.id}`}
+      className={`game-card ${hovered ? 'hovered' : ''}`}
+      onMouseEnter={() => setHovered(true)}
+      onMouseLeave={() => setHovered(false)}
+    >
+      <div className="game-media">
+        <img src={hovered ? game.preview : game.image} alt={game.name} />
+        <div className="game-overlay">
+          <span className="pill">{game.genre}</span>
+          <span className="pill pill-dark">Preview ativo</span>
         </div>
+      </div>
+      <div className="game-copy">
+        <strong>{game.name}</strong>
+        <span>{game.size}</span>
       </div>
     </Link>
   )
 }
 
-
-// Páginas (Telas)
-
-function Home() {
-  return (
-    <div>
-      <Carousel autoPlay infiniteLoop showThumbs={false} showStatus={false} interval={4000}>
-        {slides.map((slide, i) => (
-          <div key={i} style={{ position: "relative" }}>
-            <img src={slide.image} style={{ height: "380px", objectFit: "cover", filter: "brightness(0.6)" }} />
-            <div style={{
-              position: "absolute",
-              bottom: 0, left: 0, right: 0,
-              padding: "30px",
-              background: "linear-gradient(0deg, rgba(5,5,15,0.95) 0%, transparent 100%)",
-              textAlign: "left"
-            }}>
-              <p style={{ fontSize: "10px", color: "var(--accent2)", letterSpacing: "4px", marginBottom: "8px" }}>DESTAQUE</p>
-              <h2 style={{ fontSize: "22px", color: "var(--text)", letterSpacing: "3px", textShadow: "0 0 20px var(--glow)" }}>
-                {slide.title}
-              </h2>
-            </div>
-          </div>
-        ))}
-      </Carousel>
-
-      <div style={{ marginTop: "40px" }}>
-        <p className="section-title">Ultimos Tutoriais</p>
-        <div style={{ display: "flex", gap: "20px", flexWrap: "wrap" }}>
-          {posts.map((post, i) => (
-            <Card key={i} id={post.id} title={post.title} image={post.image} category={post.category} />
-          ))}
-        </div>
-      </div>
-    </div>
-  )
-}
-
-function Jogos() {
-  const [search, setSearch] = useState("")
-  const filteredGames = games.filter(game => game.name.toLowerCase().includes(search.toLowerCase()))
+function GamePage({ onOpenLightbox }) {
+  const { id } = useParams()
+  const game = games.find((entry) => entry.id === id) ?? games[0]
 
   return (
-    <div>
-      <p className="section-title">Jogos de PS3</p>
-
-      <input
-        className="input"
-        type="text"
-        placeholder="Buscar jogo..."
-        value={search}
-        onChange={(e) => setSearch(e.target.value)}
-      />
-
-      <div style={{ display: "flex", gap: "16px", flexWrap: "wrap", marginTop: "24px" }}>
-        {filteredGames.map((game, i) => (
-          <Link key={i} to={`/jogo/${game.id}`}>
-            <div style={{
-              width: "180px",
-              background: "var(--bg-card)",
-              border: "1px solid var(--border)",
-              borderBottom: "2px solid var(--accent)",
-              overflow: "hidden",
-              clipPath: "polygon(0 0, calc(100% - 10px) 0, 100% 10px, 100% 100%, 10px 100%, 0 calc(100% - 10px))",
-              transition: "transform 0.2s, box-shadow 0.2s",
-              cursor: "pointer"
-            }}
-              onMouseEnter={e => {
-                e.currentTarget.style.transform = "translateY(-4px)"
-                e.currentTarget.style.boxShadow = "0 0 16px var(--glow)"
-              }}
-              onMouseLeave={e => {
-                e.currentTarget.style.transform = "translateY(0)"
-                e.currentTarget.style.boxShadow = "none"
-              }}
-            >
-              <img src={game.image} style={{ width: "100%", height: "220px", objectFit: "cover", display: "block" }} />
-              <div style={{ padding: "10px" }}>
-                <p style={{ fontSize: "11px", color: "var(--text)", letterSpacing: "1px" }}>{game.name}</p>
-                <p style={{ fontSize: "10px", color: "var(--text-muted)", marginTop: "4px", letterSpacing: "1px" }}>{game.genre}</p>
-              </div>
-            </div>
-          </Link>
-        ))}
-      </div>
-    </div>
-  )
-}
-
-function Tutoriais() {
-  const [search, setSearch] = useState("")
-  const filteredPosts = posts.filter(post => post.title.toLowerCase().includes(search.toLowerCase()))
-
-  return (
-    <div>
-      <p className="section-title">Tutoriais de PS3</p>
-
-      <input
-        className="input"
-        type="text"
-        placeholder="Buscar tutorial..."
-        value={search}
-        onChange={(e) => setSearch(e.target.value)}
-      />
-
-      <div style={{ display: "flex", gap: "20px", flexWrap: "wrap", marginTop: "24px" }}>
-        {filteredPosts.length > 0
-          ? filteredPosts.map((post, i) => (
-              <Card key={i} id={post.id} title={post.title} image={post.image} category={post.category} />
-            ))
-          : <p style={{ color: "var(--text-muted)", letterSpacing: "2px", fontSize: "13px" }}>Nenhum tutorial encontrado.</p>
-        }
-      </div>
-    </div>
-  )
-}
-
-function Downloads() {
-  const [search, setSearch] = useState("")
-  const [category, setCategory] = useState("all")
-
-  const filteredDownloads = downloadList.filter(item => {
-    const matchSearch = item.name.toLowerCase().includes(search.toLowerCase())
-    const matchCategory = category === "all" || item.type === category
-    return matchSearch && matchCategory
-  })
-
-  return (
-    <div>
-      <p className="section-title">Downloads de PS3</p>
-
-      <div style={{ display: "flex", gap: "8px", marginBottom: "16px", flexWrap: "wrap" }}>
-        {["all", "Homebrew", "Plugin", "Exploit", "Loja Homebrew"].map(cat => (
-          <button key={cat} className="btn" onClick={() => setCategory(cat)}
-            style={{ opacity: category === cat ? 1 : 0.4, fontSize: "10px", padding: "7px 16px" }}>
-            {cat === "all" ? "Todos" : cat}
+    <div className="game-page" style={{ '--page-bg': `url(${game.backdrop})` }}>
+      <div className="game-page-backdrop" />
+      <div className="game-layout">
+        <aside className="game-sidebar">
+          <img className="game-cover" src={game.image} alt={game.name} />
+          <button type="button" className="primary-btn large-btn">
+            <span className="icon">{icons.download}</span>
+            Download
           </button>
+          <div className="spec-list">
+            <Spec icon="hardDrive" label="Tamanho" value={game.size} />
+            <Spec icon="file" label="Formato" value={game.format} />
+            <Spec icon="cpu" label="Firmware" value={game.firmware} />
+          </div>
+        </aside>
+        <section className="game-main">
+          <span className="eyebrow">Página do jogo</span>
+          <h1>{game.name}</h1>
+          <div className="tag-row">
+            {game.tags.map((tag) => <span key={tag} className="tag-chip"><span className="icon">{icons.tag}</span>{tag}</span>)}
+          </div>
+          <p className="game-description">{game.description}</p>
+          <div className="content-card">
+            <div className="section-heading compact">
+              <h2>Galeria</h2>
+              <span>Clique para ampliar</span>
+            </div>
+            <div className="screenshot-grid">
+              {game.screenshots.map((shot) => (
+                <button key={shot} type="button" className="shot-card" onClick={() => onOpenLightbox(shot)}>
+                  <img src={shot} alt={`Screenshot de ${game.name}`} />
+                </button>
+              ))}
+            </div>
+          </div>
+          <div className="content-card trailer-card">
+            <div className="section-heading compact">
+              <h2>Trailer</h2>
+              <span>Embed elegante sem moldura pesada</span>
+            </div>
+            <div className="video-frame">
+              <iframe src={game.trailer} title={`Trailer de ${game.name}`} allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerPolicy="strict-origin-when-cross-origin" allowFullScreen />
+            </div>
+          </div>
+        </section>
+      </div>
+    </div>
+  )
+}
+
+function PostPage() {
+  const { id } = useParams()
+  const post = posts.find((entry) => entry.id === id) ?? posts[0]
+  return (
+    <article className="article-page">
+      <div className="article-hero" style={{ backgroundImage: `linear-gradient(180deg, rgba(9,9,12,0.15), rgba(9,9,12,0.88)), url(${post.image})` }}>
+        <span className="eyebrow">{post.kicker}</span>
+        <h1>{post.title}</h1>
+        <p>{post.content}</p>
+      </div>
+      <div className="article-body content-card">
+        <p>Atualize o console para o firmware correto, prepare o dispositivo USB e use o navegador para abrir a etapa de ativação. Em seguida, execute a instalação do pacote, reinicie e confirme o ícone do HEN no XMB para garantir que o desbloqueio está pronto.</p>
+        <div className="video-frame">
+          <iframe src={post.video} title={post.title} allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerPolicy="strict-origin-when-cross-origin" allowFullScreen />
+        </div>
+      </div>
+    </article>
+  )
+}
+
+function DownloadsPage() {
+  return (
+    <section className="downloads-page section-block">
+      <div className="section-heading">
+        <span className="eyebrow">Downloads rápidos</span>
+        <h2>Utilitários essenciais com leitura clara e foco em conversão.</h2>
+      </div>
+      <div className="downloads-grid">
+        {downloads.map((item) => (
+          <div key={item.id} className="download-card">
+            <span className="icon">{icons.download}</span>
+            <strong>{item.name}</strong>
+            <p>{item.type}</p>
+            <span>{item.size}</span>
+            <button type="button" className="secondary-btn full">Baixar agora</button>
+          </div>
         ))}
       </div>
-
-      <input
-        className="input"
-        type="text"
-        placeholder="Buscar arquivo..."
-        value={search}
-        onChange={(e) => setSearch(e.target.value)}
-      />
-
-      <div style={{ marginTop: "24px", display: "flex", flexDirection: "column", gap: "12px" }}>
-        {filteredDownloads.length > 0 ? filteredDownloads.map((item, i) => (
-          <div key={i} style={{
-            background: "var(--bg-card)",
-            border: "1px solid var(--border)",
-            borderLeft: "3px solid var(--accent2)",
-            padding: "16px 20px",
-            display: "flex",
-            justifyContent: "space-between",
-            alignItems: "center",
-            clipPath: "polygon(0 0, calc(100% - 10px) 0, 100% 10px, 100% 100%, 0 100%)"
-          }}>
-            <div>
-              <p style={{ fontSize: "14px", letterSpacing: "2px", color: "var(--text)" }}>{item.name}</p>
-              <p style={{ fontSize: "11px", color: "var(--text-muted)", marginTop: "4px", letterSpacing: "1px" }}>
-                {item.type} — {item.size}
-              </p>
-            </div>
-            <Link to={`/download/${item.id}`}>
-              <button className="btn">Baixar</button>
-            </Link>
-          </div>
-        )) : (
-          <p style={{ color: "var(--text-muted)", letterSpacing: "2px", fontSize: "13px" }}>Nenhum arquivo encontrado.</p>
-        )}
-      </div>
-    </div>
+    </section>
   )
 }
 
-function Post() {
-  const { id } = useParams()
-  const post = posts.find(p => p.id === id)
-
-  if (!post) return <h2 style={{ color: "var(--text-muted)", letterSpacing: "3px" }}>Tutorial não encontrado.</h2>
-
+function CommandPalette({ query, setQuery, items, onClose, onSelect }) {
   return (
-    <div style={{ maxWidth: "900px" }}>
-      <p style={{ fontSize: "10px", color: "var(--accent2)", letterSpacing: "4px", marginBottom: "12px" }}>{post.category.toUpperCase()}</p>
-      <h1 style={{ fontSize: "26px", letterSpacing: "3px", textShadow: "0 0 20px var(--glow)" }}>{post.title}</h1>
-
-      <img src={post.image} style={{ width: "100%", maxHeight: "400px", objectFit: "cover", marginTop: "20px", borderBottom: "2px solid var(--accent2)" }} />
-
-      {post.video && (
-        <iframe width="100%" height="400" src={post.video} title="Tutorial"
-          style={{ marginTop: "20px", border: "1px solid var(--border)", display: "block" }} allowFullScreen />
-      )}
-
-      <div style={{ marginTop: "30px", lineHeight: "1.8", fontSize: "15px", color: "var(--text-muted)", whiteSpace: "pre-line", borderLeft: "2px solid var(--accent2)", paddingLeft: "20px" }}>
-        {post.content}
-      </div>
-    </div>
-  )
-}
-
-
-function Game() {
-  const { id } = useParams()
-  const game = games.find(g => g.id === id)
-
-  if (!game) return <h2 style={{ color: "var(--text-muted)", letterSpacing: "3px" }}>Jogo não encontrado.</h2>
-
-  return (
-    <div>
-      <p className="section-title">{game.name}</p>
-      <img src={game.image} style={{ width: "280px", border: "1px solid var(--border)", borderBottom: "2px solid var(--accent)", display: "block" }} />
-      <div style={{ marginTop: "20px", display: "flex", flexDirection: "column", gap: "10px" }}>
-        <p style={{ fontSize: "13px", letterSpacing: "2px" }}>
-          <span style={{ color: "var(--accent2)" }}>GENERO — </span>{game.genre}
-        </p>
-        <p style={{ fontSize: "13px", letterSpacing: "2px" }}>
-          <span style={{ color: "var(--accent2)" }}>TAMANHO — </span>{game.size}
-        </p>
-      </div>
-    </div>
-  )
-}
-
-function DownloadPage() {
-  const { id } = useParams()
-  const file = downloadList.find(d => d.id === id)
-
-  if (!file) return <h2 style={{ color: "var(--text-muted)", letterSpacing: "3px" }}>Download não encontrado.</h2>
-
-  return (
-    <div>
-      <p className="section-title">{file.name}</p>
-      <div style={{ display: "flex", flexDirection: "column", gap: "10px", marginBottom: "24px" }}>
-        <p style={{ fontSize: "13px", letterSpacing: "2px" }}>
-          <span style={{ color: "var(--accent2)" }}>TIPO — </span>{file.type}
-        </p>
-        <p style={{ fontSize: "13px", letterSpacing: "2px" }}>
-          <span style={{ color: "var(--accent2)" }}>TAMANHO — </span>{file.size}
-        </p>
-      </div>
-      <button className="btn" onClick={() => window.open(file.url)}>Baixar arquivo</button>
-    </div>
-  )
-}
-
-function Contato() {
-  return (
-    <div style={{ maxWidth: "600px" }}>
-      <p className="section-title">Contato</p>
-      <p style={{ color: "var(--text-muted)", fontSize: "13px", letterSpacing: "1px", marginBottom: "24px" }}>
-        Duvidas ou sugestoes? Envia uma mensagem.
-      </p>
-      <div style={{ display: "flex", flexDirection: "column", gap: "12px" }}>
-        <input className="input" type="text" placeholder="Seu nome" />
-        <input className="input" type="email" placeholder="Seu email" />
-        <textarea className="input" placeholder="Sua mensagem" rows="5" style={{ resize: "vertical", maxWidth: "100%" }} />
-        <div>
-          <button className="btn">Enviar mensagem</button>
+    <div className="command-backdrop" onClick={onClose}>
+      <div className="command-modal" onClick={(event) => event.stopPropagation()}>
+        <div className="command-input-row">
+          <span className="icon">{icons.search}</span>
+          <input autoFocus value={query} onChange={(event) => setQuery(event.target.value)} placeholder="Busque jogos, tutoriais e arquivos..." />
+          <button type="button" className="icon-button" onClick={onClose}><span className="icon">{icons.x}</span></button>
+        </div>
+        <div className="command-results">
+          {items.map((item) => (
+            <button key={`${item.type}-${item.title}`} type="button" className="command-item" onClick={() => onSelect(item.to)}>
+              <div>
+                <strong>{item.title}</strong>
+                <span>{item.subtitle}</span>
+              </div>
+              <em>{item.type}</em>
+            </button>
+          ))}
+          {items.length === 0 && <div className="empty-state">Nenhum resultado encontrado.</div>}
         </div>
       </div>
     </div>
   )
 }
 
-
-function Sobre() {
+function Lightbox({ image, onClose }) {
   return (
-    <div style={{ maxWidth: "700px" }}>
-      <p className="section-title">Sobre o MeuPS3</p>
-      <p style={{ lineHeight: "1.8", fontSize: "14px", color: "var(--text-muted)", letterSpacing: "1px", borderLeft: "2px solid var(--accent2)", paddingLeft: "20px" }}>
-        O MeuPS3 é um site dedicado ao PlayStation 3, com tutoriais,
-        downloads de homebrew, listas de jogos e guias para desbloqueio do console.
-        O objetivo é centralizar informações úteis para a comunidade.
-      </p>
+    <div className="lightbox-backdrop" onClick={onClose}>
+      <button type="button" className="icon-button lightbox-close" onClick={onClose}><span className="icon">{icons.x}</span></button>
+      <img src={image} alt="Screenshot ampliada" className="lightbox-image" />
     </div>
   )
 }
 
-function NotFound() {
-  return (
-    <div>
-      <h1 style={{ fontSize: "80px", color: "var(--accent)", textShadow: "0 0 40px var(--glow)", letterSpacing: "8px" }}>404</h1>
-      <p style={{ color: "var(--text-muted)", letterSpacing: "3px", fontSize: "13px", marginTop: "12px" }}>Pagina não encontrada.</p>
-      <Link to="/" style={{ display: "inline-block", marginTop: "20px" }}>
-        <button className="btn">Voltar para Home</button>
-      </Link>
-    </div>
-  )
+function RevealSection({ children }) {
+  const ref = useRef(null)
+  const [visible, setVisible] = useState(false)
+
+  useEffect(() => {
+    const element = ref.current
+    if (!element) return
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach((entry) => {
+        if (entry.isIntersecting) {
+          setVisible(true)
+          observer.disconnect()
+        }
+      })
+    }, { threshold: 0.2 })
+    observer.observe(element)
+    return () => observer.disconnect()
+  }, [])
+
+  return <div ref={ref} className={`reveal-section ${visible ? 'visible' : ''}`}>{children}</div>
 }
 
-function App() {
-
-
+function Spec({ icon, label, value }) {
   return (
-
-    <BrowserRouter>
-
-      <div style={{ background: "#111", minHeight: "100vh", color: "white" }}>
-
-        <header style={{
-          background: "linear-gradient(180deg, #0a0a1f 0%, #05050f 100%)",
-          padding: "0 30px",
-          height: "70px",
-          borderBottom: "2px solid var(--accent2)",
-          display: "flex",
-          justifyContent: "space-between",
-          alignItems: "center",
-          position: "sticky",
-          top: 0,
-          zIndex: 100,
-          boxShadow: "0 4px 30px var(--glow2)"
-        }}>
-          <div style={{ display: "flex", flexDirection: "column", lineHeight: 1 }}>
-            <h1 style={{
-              color: "var(--accent)",
-              fontSize: "28px",
-              textShadow: "0 0 20px var(--glow), 0 0 40px var(--glow)",
-              letterSpacing: "4px"
-            }}>
-              MEUPS3
-            </h1>
-            <span style={{ fontSize: "9px", color: "var(--accent2)", letterSpacing: "5px" }}>
-              The PLAYSTATION 3 SITE
-            </span>
-          </div>
-
-          <nav style={{ display: "flex", gap: "4px" }}>
-            {[
-              { to: "/", label: "Home" },
-              { to: "/jogos", label: "Jogos" },
-              { to: "/tutoriais", label: "Tutoriais" },
-              { to: "/downloads", label: "Downloads" },
-              { to: "/contato", label: "Contato" },
-              { to: "/sobre", label: "Sobre" },
-            ].map(({ to, label }) => (
-              <NavLink key={to} to={to} style={({ isActive }) => ({
-                padding: "6px 14px",
-                fontSize: "11px",
-                letterSpacing: "2px",
-                textTransform: "uppercase",
-                color: isActive ? "#05050f" : "var(--text-muted)",
-                background: isActive ? "var(--accent)" : "transparent",
-                clipPath: "polygon(6px 0%, 100% 0%, calc(100% - 6px) 100%, 0% 100%)",
-                boxShadow: isActive ? "0 0 12px var(--glow)" : "none",
-                transition: "all 0.2s"
-              })}>
-                {label}
-              </NavLink>
-            ))}
-          </nav>
-        </header>
-
-        <div style={{ display: "flex" }}>
-
-          <aside style={{
-            width: "220px",
-            minHeight: "calc(100vh - 70px)",
-            background: "var(--bg-sidebar)",
-            borderRight: "2px solid var(--border)",
-            padding: "24px 14px",
-            flexShrink: 0
-          }}>
-            <p className="section-title">Navegação</p>
-            <ul style={{ listStyle: "none", display: "flex", flexDirection: "column", gap: "2px" }}>
-              {[
-                { to: "/", label: "Home" },
-                { to: "/jogos", label: "Videojogos" },
-                { to: "/tutoriais", label: "Tutoriais" },
-                { to: "/downloads", label: "Downloads" },
-              ].map(({ to, label }) => (
-                <li key={to}>
-                  <NavLink to={to} style={({ isActive }) => ({
-                    display: "block",
-                    padding: "9px 12px",
-                    fontSize: "12px",
-                    letterSpacing: "2px",
-                    textTransform: "uppercase",
-                    color: isActive ? "var(--accent)" : "var(--text-muted)",
-                    borderLeft: isActive ? "3px solid var(--accent)" : "3px solid transparent",
-                    background: isActive ? "rgba(0,195,255,0.06)" : "transparent",
-                    textShadow: isActive ? "0 0 10px var(--glow)" : "none",
-                    transition: "all 0.2s"
-                  })}>
-                    {label}
-                  </NavLink>
-                </li>
-              ))}
-            </ul>
-
-            <p className="section-title" style={{ marginTop: "32px" }}>🔥 Populares</p>
-            <ul style={{ listStyle: "none", display: "flex", flexDirection: "column", gap: "10px" }}>
-              {popularGames.map((game, i) => (
-                <li key={i} style={{ display: "flex", alignItems: "center", gap: "8px" }}>
-                  <span style={{ color: "var(--accent2)", fontSize: "11px" }}>0{i + 1}</span>
-                  <Link to={`/jogo/${game.id}`} style={{
-                    color: "var(--text-muted)",
-                    fontSize: "12px",
-                    letterSpacing: "1px",
-                    textTransform: "uppercase"
-                  }}>
-                    {game.name}
-                  </Link>
-                </li>
-              ))}
-            </ul>
-          </aside>
-
-          <main style={{ flex: 1, padding: "20px" }}>
-
-            <Routes>
-
-              <Route path="/" element={<Home />} />
-
-              <Route path="/jogos" element={<Jogos />} />
-
-              <Route path="/tutoriais" element={<Tutoriais />} />
-
-              <Route path="/downloads" element={<Downloads />} />
-
-              <Route path="/download/:id" element={<DownloadPage />} />
-
-              <Route path="/post/:id" element={<Post />} />
-
-              <Route path="/jogo/:id" element={<Game />} />
-
-              <Route path="/contato" element={<Contato />} />
-
-              <Route path="/sobre" element={<Sobre />} />
-
-              <Route path="*" element={<NotFound />} />
-
-            </Routes>
-
-          </main>
-
-        </div>
-
-        <footer style={{
-  background: "var(--bg-sidebar)",
-  borderTop: "2px solid var(--accent2)",
-  padding: "24px 30px",
-  display: "flex",
-  justifyContent: "space-between",
-  alignItems: "center",
-  boxShadow: "0 -4px 30px var(--glow2)"
-}}>
-  <div>
-    <p style={{ color: "var(--accent)", fontSize: "18px", letterSpacing: "4px", textShadow: "0 0 10px var(--glow)" }}>MEUSP3</p>
-    <p style={{ color: "var(--text-muted)", fontSize: "10px", letterSpacing: "3px", marginTop: "4px" }}>PLAYSTATION 3 FANSITE</p>
-  </div>
-  <p style={{ color: "var(--border)", fontSize: "11px", letterSpacing: "2px" }}>
-    © {new Date().getFullYear()} — TODOS OS DIREITOS RESERVADOS
-  </p>
-</footer>
-
+    <div className="spec-item">
+      <span className="icon">{icons[icon]}</span>
+      <div>
+        <small>{label}</small>
+        <strong>{value}</strong>
       </div>
-
-    </BrowserRouter>
-
+    </div>
   )
-
-
 }
 
 export default App
