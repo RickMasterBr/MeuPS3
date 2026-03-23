@@ -225,23 +225,34 @@ const downloadList = [
 
 function Card({ id, title, image, category }) {
   return (
-
-    <Link to={`/post/${id}`} style={{ textDecoration: "none", color: "white" }}>
-
-      <div style={{ width: "250px", background: "#1c1c1c", borderRadius: "8px", overflow: "hidden", cursor: "pointer" }}>
-
-        <img src={image} style={{ width: "100%", height: "150px", objectFit: "cover" }} />
-
-        <div style={{ padding: "10px" }}>
-
-          <p style={{ fontSize: "12px", color: "red", margin: "0 0 5px 0" }}>{category}</p>
-
-          <h3 style={{ fontSize: "16px", margin: 0 }}>{title}</h3>
-
+    <Link to={`/post/${id}`}>
+      <div style={{
+        width: "250px",
+        background: "var(--bg-card)",
+        border: "1px solid var(--border)",
+        borderBottom: "2px solid var(--accent2)",
+        overflow: "hidden",
+        clipPath: "polygon(0 0, calc(100% - 12px) 0, 100% 12px, 100% 100%, 12px 100%, 0 calc(100% - 12px))",
+        transition: "transform 0.2s, box-shadow 0.2s",
+        cursor: "pointer"
+      }}
+        onMouseEnter={e => {
+          e.currentTarget.style.transform = "translateY(-4px)"
+          e.currentTarget.style.boxShadow = "0 0 20px var(--glow2)"
+        }}
+        onMouseLeave={e => {
+          e.currentTarget.style.transform = "translateY(0)"
+          e.currentTarget.style.boxShadow = "none"
+        }}
+      >
+        <img src={image} style={{ width: "100%", height: "150px", objectFit: "cover", display: "block" }} />
+        <div style={{ padding: "12px" }}>
+          <p style={{ fontSize: "10px", color: "var(--accent2)", letterSpacing: "3px", marginBottom: "6px" }}>
+            {category.toUpperCase()}
+          </p>
+          <h3 style={{ fontSize: "14px", color: "var(--text)", letterSpacing: "1px" }}>{title}</h3>
         </div>
-
       </div>
-
     </Link>
   )
 }
@@ -250,115 +261,115 @@ function Card({ id, title, image, category }) {
 // Páginas (Telas)
 
 function Home() {
-
-  const [index, setIndex] = useState(0)
-
-  useEffect(() => {
-    const interval = setInterval(() => {
-      setIndex((prev) => (prev + 1) % slides.length)
-    }, 4000)
-
-    return () => clearInterval(interval)
-  }, [])
-
   return (
     <div>
-
       <Carousel autoPlay infiniteLoop showThumbs={false} showStatus={false} interval={4000}>
-
         {slides.map((slide, i) => (
-
-          <div key={i}>
-
-            <img src={slide.image} style={{ height: "350px", objectFit: "cover" }} />
-
-            <p className="legend">{slide.title}</p>
-
+          <div key={i} style={{ position: "relative" }}>
+            <img src={slide.image} style={{ height: "380px", objectFit: "cover", filter: "brightness(0.6)" }} />
+            <div style={{
+              position: "absolute",
+              bottom: 0, left: 0, right: 0,
+              padding: "30px",
+              background: "linear-gradient(0deg, rgba(5,5,15,0.95) 0%, transparent 100%)",
+              textAlign: "left"
+            }}>
+              <p style={{ fontSize: "10px", color: "var(--accent2)", letterSpacing: "4px", marginBottom: "8px" }}>DESTAQUE</p>
+              <h2 style={{ fontSize: "22px", color: "var(--text)", letterSpacing: "3px", textShadow: "0 0 20px var(--glow)" }}>
+                {slide.title}
+              </h2>
+            </div>
           </div>
-
         ))}
-
       </Carousel>
 
-      <h2 style={{ marginTop: "30px" }}>Últimos tutoriais</h2>
-
-      <div style={{ display: "flex", gap: "20px", flexWrap: "wrap" }}>
-
-        {posts.map((post, i) => (
-
-          <Card key={i} id={post.id} title={post.title} image={post.image} category={post.category} />
-
-        ))}
-
+      <div style={{ marginTop: "40px" }}>
+        <p className="section-title">Ultimos Tutoriais</p>
+        <div style={{ display: "flex", gap: "20px", flexWrap: "wrap" }}>
+          {posts.map((post, i) => (
+            <Card key={i} id={post.id} title={post.title} image={post.image} category={post.category} />
+          ))}
+        </div>
       </div>
-
     </div>
   )
 }
 
 function Jogos() {
-
   const [search, setSearch] = useState("")
   const filteredGames = games.filter(game => game.name.toLowerCase().includes(search.toLowerCase()))
 
   return (
     <div>
+      <p className="section-title">Jogos de PS3</p>
 
-      <h1>Jogos de PS3</h1>
+      <input
+        className="input"
+        type="text"
+        placeholder="Buscar jogo..."
+        value={search}
+        onChange={(e) => setSearch(e.target.value)}
+      />
 
-      <input type="text" placeholder="Buscar jogo..." value={search} onChange={(e) => setSearch(e.target.value)} style={{ marginTop: "20px", padding: "10px", width: "300px", borderRadius: "6px", border: "none", outline: "none" }} />
-
-      <div style={{ display: "flex", gap: "20px", flexWrap: "wrap", marginTop: "20px" }}>
-
+      <div style={{ display: "flex", gap: "16px", flexWrap: "wrap", marginTop: "24px" }}>
         {filteredGames.map((game, i) => (
-          <Link key={i} to={`/jogo/${game.id}`} style={{ textDecoration: "none", color: "white" }}>
-
-            <div style={{ width: "200px", background: "#1c1c1c", borderRadius: "8px", overflow: "hidden" }}>
-
-              <img src={game.image} style={{ width: "100%", height: "250px", objectFit: "cover" }} />
-
+          <Link key={i} to={`/jogo/${game.id}`}>
+            <div style={{
+              width: "180px",
+              background: "var(--bg-card)",
+              border: "1px solid var(--border)",
+              borderBottom: "2px solid var(--accent)",
+              overflow: "hidden",
+              clipPath: "polygon(0 0, calc(100% - 10px) 0, 100% 10px, 100% 100%, 10px 100%, 0 calc(100% - 10px))",
+              transition: "transform 0.2s, box-shadow 0.2s",
+              cursor: "pointer"
+            }}
+              onMouseEnter={e => {
+                e.currentTarget.style.transform = "translateY(-4px)"
+                e.currentTarget.style.boxShadow = "0 0 16px var(--glow)"
+              }}
+              onMouseLeave={e => {
+                e.currentTarget.style.transform = "translateY(0)"
+                e.currentTarget.style.boxShadow = "none"
+              }}
+            >
+              <img src={game.image} style={{ width: "100%", height: "220px", objectFit: "cover", display: "block" }} />
               <div style={{ padding: "10px" }}>
-
-                <h3 style={{ fontSize: "16px" }}>{game.name}</h3>
-
+                <p style={{ fontSize: "11px", color: "var(--text)", letterSpacing: "1px" }}>{game.name}</p>
+                <p style={{ fontSize: "10px", color: "var(--text-muted)", marginTop: "4px", letterSpacing: "1px" }}>{game.genre}</p>
               </div>
-
             </div>
-
           </Link>
         ))}
-
       </div>
-
     </div>
   )
 }
 
 function Tutoriais() {
-
   const [search, setSearch] = useState("")
-
   const filteredPosts = posts.filter(post => post.title.toLowerCase().includes(search.toLowerCase()))
 
   return (
     <div>
+      <p className="section-title">Tutoriais de PS3</p>
 
-      <h1>Tutorias de PS3</h1>
+      <input
+        className="input"
+        type="text"
+        placeholder="Buscar tutorial..."
+        value={search}
+        onChange={(e) => setSearch(e.target.value)}
+      />
 
-      <input type="text" placeholder="Buscar tutorial..." value={search} onChange={(e) => setSearch(e.target.value)} style={{ marginTop: "20px", padding: "10px", width: "300px", borderRadius: "6px", border: "none", outline: "none" }} />
-
-      <div style={{ display: "flex", gap: "20px", flexWrap: "wrap", marginTop: "20px" }}>
-
-        {filteredPosts.length > 0 ? (
-          filteredPosts.map((post, i) => (
-            <Card key={i} id={post.id} title={post.title} image={post.image} category={post.category} />
-          ))
-        ) : (
-          <p>Nenhum tutorial encontrado</p>
-        )}
-
+      <div style={{ display: "flex", gap: "20px", flexWrap: "wrap", marginTop: "24px" }}>
+        {filteredPosts.length > 0
+          ? filteredPosts.map((post, i) => (
+              <Card key={i} id={post.id} title={post.title} image={post.image} category={post.category} />
+            ))
+          : <p style={{ color: "var(--text-muted)", letterSpacing: "2px", fontSize: "13px" }}>Nenhum tutorial encontrado.</p>
+        }
       </div>
-
     </div>
   )
 }
@@ -367,65 +378,57 @@ function Downloads() {
   const [search, setSearch] = useState("")
   const [category, setCategory] = useState("all")
 
-  // Filtra os downloads
   const filteredDownloads = downloadList.filter(item => {
-
     const matchSearch = item.name.toLowerCase().includes(search.toLowerCase())
-
     const matchCategory = category === "all" || item.type === category
-
     return matchSearch && matchCategory
   })
 
-  const handleDownload = (nome) => {
-    alert(`A iniciar o download de: ${nome}`)
-    // No futuro, aqui podes colocar a lógica real de download (window.open, etc)
-  }
-
   return (
     <div>
-      <h1>Downloads de PS3</h1>
+      <p className="section-title">Downloads de PS3</p>
 
-      <div style={{ marginTop: "20px", display: "flex", gap: "10px" }}>
-
-        <button onClick={() => setCategory("all")}>Todos</button>
-
-        <button onClick={() => setCategory("Homebrew")}>Homebrew</button>
-
-        <button onClick={() => setCategory("Plugin")}>Plugins</button>
-
-        <button onClick={() => setCategory("Exploit")}>Exploit</button>
-
+      <div style={{ display: "flex", gap: "8px", marginBottom: "16px", flexWrap: "wrap" }}>
+        {["all", "Homebrew", "Plugin", "Exploit", "Loja Homebrew"].map(cat => (
+          <button key={cat} className="btn" onClick={() => setCategory(cat)}
+            style={{ opacity: category === cat ? 1 : 0.4, fontSize: "10px", padding: "7px 16px" }}>
+            {cat === "all" ? "Todos" : cat}
+          </button>
+        ))}
       </div>
 
       <input
+        className="input"
         type="text"
-        placeholder="Buscar ficheiro..."
+        placeholder="Buscar arquivo..."
         value={search}
         onChange={(e) => setSearch(e.target.value)}
-        style={{ marginTop: "20px", padding: "10px", width: "300px", borderRadius: "6px", border: "none", outline: "none" }}
       />
 
-      <div style={{ marginTop: "30px", display: "flex", flexDirection: "column", gap: "15px" }}>
-        {filteredDownloads.length > 0 ? (
-          filteredDownloads.map((item, i) => (
-            <div key={i} style={{ background: "#1c1c1c", padding: "15px", borderRadius: "8px", display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-
-              <div>
-                <h3 style={{ margin: 0, fontSize: "18px" }}>{item.name}</h3>
-                <p style={{ margin: "5px 0 0 0", fontSize: "14px", color: "#ccc" }}>{item.type} • {item.size}</p>
-              </div>
-
-              <Link to={`/download/${item.id}`}>
-                <button style={{ background: "red", color: "white", border: "none", padding: "10px 20px", borderRadius: "5px", cursor: "pointer", fontWeight: "bold" }}>
-                  Baixar
-                </button>
-              </Link>
-
+      <div style={{ marginTop: "24px", display: "flex", flexDirection: "column", gap: "12px" }}>
+        {filteredDownloads.length > 0 ? filteredDownloads.map((item, i) => (
+          <div key={i} style={{
+            background: "var(--bg-card)",
+            border: "1px solid var(--border)",
+            borderLeft: "3px solid var(--accent2)",
+            padding: "16px 20px",
+            display: "flex",
+            justifyContent: "space-between",
+            alignItems: "center",
+            clipPath: "polygon(0 0, calc(100% - 10px) 0, 100% 10px, 100% 100%, 0 100%)"
+          }}>
+            <div>
+              <p style={{ fontSize: "14px", letterSpacing: "2px", color: "var(--text)" }}>{item.name}</p>
+              <p style={{ fontSize: "11px", color: "var(--text-muted)", marginTop: "4px", letterSpacing: "1px" }}>
+                {item.type} — {item.size}
+              </p>
             </div>
-          ))
-        ) : (
-          <p>Nenhum ficheiro encontrado.</p>
+            <Link to={`/download/${item.id}`}>
+              <button className="btn">Baixar</button>
+            </Link>
+          </div>
+        )) : (
+          <p style={{ color: "var(--text-muted)", letterSpacing: "2px", fontSize: "13px" }}>Nenhum arquivo encontrado.</p>
         )}
       </div>
     </div>
@@ -433,214 +436,118 @@ function Downloads() {
 }
 
 function Post() {
-
   const { id } = useParams()
-
   const post = posts.find(p => p.id === id)
 
-  if (!post) {
-    return <h2>Tutorial não encontrado</h2>
-  }
+  if (!post) return <h2 style={{ color: "var(--text-muted)", letterSpacing: "3px" }}>Tutorial não encontrado.</h2>
 
   return (
-
     <div style={{ maxWidth: "900px" }}>
+      <p style={{ fontSize: "10px", color: "var(--accent2)", letterSpacing: "4px", marginBottom: "12px" }}>{post.category.toUpperCase()}</p>
+      <h1 style={{ fontSize: "26px", letterSpacing: "3px", textShadow: "0 0 20px var(--glow)" }}>{post.title}</h1>
 
-      <h1>{post.title}</h1>
-
-      <img
-        src={post.image}
-        style={{
-          width: "100%",
-          maxHeight: "400px",
-          objectFit: "cover",
-          marginTop: "20px",
-          borderRadius: "8px"
-        }}
-      />
-
-      <p style={{ marginTop: "20px", color: "#aaa" }}>
-        Categoria: {post.category}
-      </p>
+      <img src={post.image} style={{ width: "100%", maxHeight: "400px", objectFit: "cover", marginTop: "20px", borderBottom: "2px solid var(--accent2)" }} />
 
       {post.video && (
-
-        <iframe
-          width="100%"
-          height="400"
-          src={post.video}
-          title="Tutorial video"
-          style={{ marginTop: "20px", borderRadius: "8px" }}
-          allowFullScreen
-        />
-
+        <iframe width="100%" height="400" src={post.video} title="Tutorial"
+          style={{ marginTop: "20px", border: "1px solid var(--border)", display: "block" }} allowFullScreen />
       )}
 
-      <div style={{
-        marginTop: "30px",
-        lineHeight: "1.6",
-        fontSize: "18px",
-        whiteSpace: "pre-line"
-      }}>
+      <div style={{ marginTop: "30px", lineHeight: "1.8", fontSize: "15px", color: "var(--text-muted)", whiteSpace: "pre-line", borderLeft: "2px solid var(--accent2)", paddingLeft: "20px" }}>
         {post.content}
       </div>
-
     </div>
-
   )
-
 }
+
 
 function Game() {
   const { id } = useParams()
-
   const game = games.find(g => g.id === id)
 
-  if (!game) {
-    return <h2>Jogo não encontrado</h2>
-  }
+  if (!game) return <h2 style={{ color: "var(--text-muted)", letterSpacing: "3px" }}>Jogo não encontrado.</h2>
 
   return (
-
     <div>
-
-      <h1>{game.name}</h1>
-
-      <img src={game.image} style={{ width: "300px", marginTop: "20px" }} />
-
-      <p style={{ marginTop: "20px" }}><strong>Gênero:</strong> {game.genre}</p>
-
-      <p><strong>Tamanho:</strong> {game.size}</p>
-
+      <p className="section-title">{game.name}</p>
+      <img src={game.image} style={{ width: "280px", border: "1px solid var(--border)", borderBottom: "2px solid var(--accent)", display: "block" }} />
+      <div style={{ marginTop: "20px", display: "flex", flexDirection: "column", gap: "10px" }}>
+        <p style={{ fontSize: "13px", letterSpacing: "2px" }}>
+          <span style={{ color: "var(--accent2)" }}>GENERO — </span>{game.genre}
+        </p>
+        <p style={{ fontSize: "13px", letterSpacing: "2px" }}>
+          <span style={{ color: "var(--accent2)" }}>TAMANHO — </span>{game.size}
+        </p>
+      </div>
     </div>
-
   )
-
 }
 
 function DownloadPage() {
-
   const { id } = useParams()
-
   const file = downloadList.find(d => d.id === id)
 
-  if (!file) {
-    return <h2>Download não encontrado</h2>
-  }
+  if (!file) return <h2 style={{ color: "var(--text-muted)", letterSpacing: "3px" }}>Download não encontrado.</h2>
 
   return (
-
     <div>
-
-      <h1>{file.name}</h1>
-
-      <p style={{ marginTop: "20px" }}><strong>Tipo:</strong> {file.type}</p>
-
-      <p><strong>Tamanho:</strong> {file.size}</p>
-
-      <button onClick={() => window.open(file.url)} style={{ marginTop: "20px", background: "red", border: "none", padding: "12px 25px", color: "white", fontWeight: "bold", borderRadius: "6px", cursor: "pointer" }}>
-        Baixar arquivo
-      </button>
-
-
+      <p className="section-title">{file.name}</p>
+      <div style={{ display: "flex", flexDirection: "column", gap: "10px", marginBottom: "24px" }}>
+        <p style={{ fontSize: "13px", letterSpacing: "2px" }}>
+          <span style={{ color: "var(--accent2)" }}>TIPO — </span>{file.type}
+        </p>
+        <p style={{ fontSize: "13px", letterSpacing: "2px" }}>
+          <span style={{ color: "var(--accent2)" }}>TAMANHO — </span>{file.size}
+        </p>
+      </div>
+      <button className="btn" onClick={() => window.open(file.url)}>Baixar arquivo</button>
     </div>
-
   )
-
 }
 
 function Contato() {
-
   return (
-
-    <div style={{ maxWidth: "700px" }}>
-
-      <h1>Contato</h1>
-
-      <p>Se tiver dúvidas ou sugestões sobre o site, envie uma mensagem.</p>
-
-      <form style={{ display: "flex", flexDirection: "column", gap: "15px", marginTop: "20px" }}>
-
-        <input
-          type="text"
-          placeholder="Seu nome"
-          style={{ padding: "10px", borderRadius: "6px", border: "none" }}
-        />
-
-        <input
-          type="email"
-          placeholder="Seu email"
-          style={{ padding: "10px", borderRadius: "6px", border: "none" }}
-        />
-
-        <textarea
-          placeholder="Sua mensagem"
-          rows="5"
-          style={{ padding: "10px", borderRadius: "6px", border: "none" }}
-        />
-
-        <button
-          style={{
-            background: "red",
-            border: "none",
-            padding: "12px",
-            color: "white",
-            fontWeight: "bold",
-            borderRadius: "6px",
-            cursor: "pointer"
-          }}
-        >
-          Enviar mensagem
-        </button>
-
-      </form>
-
+    <div style={{ maxWidth: "600px" }}>
+      <p className="section-title">Contato</p>
+      <p style={{ color: "var(--text-muted)", fontSize: "13px", letterSpacing: "1px", marginBottom: "24px" }}>
+        Duvidas ou sugestoes? Envia uma mensagem.
+      </p>
+      <div style={{ display: "flex", flexDirection: "column", gap: "12px" }}>
+        <input className="input" type="text" placeholder="Seu nome" />
+        <input className="input" type="email" placeholder="Seu email" />
+        <textarea className="input" placeholder="Sua mensagem" rows="5" style={{ resize: "vertical", maxWidth: "100%" }} />
+        <div>
+          <button className="btn">Enviar mensagem</button>
+        </div>
+      </div>
     </div>
-
   )
-
 }
 
+
 function Sobre() {
-
   return (
-
-    <div style={{ maxWidth: "800px" }}>
-
-      <h1>Sobre o MeuPS3</h1>
-
-      <p style={{ marginTop: "20px", lineHeight: "1.6" }}>
-
+    <div style={{ maxWidth: "700px" }}>
+      <p className="section-title">Sobre o MeuPS3</p>
+      <p style={{ lineHeight: "1.8", fontSize: "14px", color: "var(--text-muted)", letterSpacing: "1px", borderLeft: "2px solid var(--accent2)", paddingLeft: "20px" }}>
         O MeuPS3 é um site dedicado ao PlayStation 3, com tutoriais,
-        downloads de homebrew, listas de jogos e guias para desbloqueio
-        do console.
-
+        downloads de homebrew, listas de jogos e guias para desbloqueio do console.
         O objetivo é centralizar informações úteis para a comunidade.
-
       </p>
-
     </div>
-
   )
-
 }
 
 function NotFound() {
-
   return (
-
     <div>
-
-      <h1>404</h1>
-
-      <p>Página não encontrada.</p>
-
-      <Link to="/" style={{ color: "red" }}>Voltar para Home</Link>
-
+      <h1 style={{ fontSize: "80px", color: "var(--accent)", textShadow: "0 0 40px var(--glow)", letterSpacing: "8px" }}>404</h1>
+      <p style={{ color: "var(--text-muted)", letterSpacing: "3px", fontSize: "13px", marginTop: "12px" }}>Pagina não encontrada.</p>
+      <Link to="/" style={{ display: "inline-block", marginTop: "20px" }}>
+        <button className="btn">Voltar para Home</button>
+      </Link>
     </div>
-
   )
-
 }
 
 function App() {
@@ -652,106 +559,112 @@ function App() {
 
       <div style={{ background: "#111", minHeight: "100vh", color: "white" }}>
 
-        <header
-          style={{
-            background: "black",
-            padding: "20px",
-            borderBottom: "2px solid red",
-            display: "flex",
-            justifyContent: "space-between",
-            alignItems: "center"
-          }}
-        >
+        <header style={{
+          background: "linear-gradient(180deg, #0a0a1f 0%, #05050f 100%)",
+          padding: "0 30px",
+          height: "70px",
+          borderBottom: "2px solid var(--accent2)",
+          display: "flex",
+          justifyContent: "space-between",
+          alignItems: "center",
+          position: "sticky",
+          top: 0,
+          zIndex: 100,
+          boxShadow: "0 4px 30px var(--glow2)"
+        }}>
+          <div style={{ display: "flex", flexDirection: "column", lineHeight: 1 }}>
+            <h1 style={{
+              color: "var(--accent)",
+              fontSize: "28px",
+              textShadow: "0 0 20px var(--glow), 0 0 40px var(--glow)",
+              letterSpacing: "4px"
+            }}>
+              MEUPS3
+            </h1>
+            <span style={{ fontSize: "9px", color: "var(--accent2)", letterSpacing: "5px" }}>
+              The PLAYSTATION 3 SITE
+            </span>
+          </div>
 
-          <h1 style={{ margin: 0, color: "red" }}>MeuPS3</h1>
-
-          <nav style={{ display: "flex", gap: "20px" }}>
-
-            <NavLink to="/" style={{ color: "white", textDecoration: "none" }}>Home</NavLink>
-
-            <NavLink to="/jogos" style={{ color: "white", textDecoration: "none" }}>Jogos</NavLink>
-
-            <NavLink to="/tutoriais" style={{ color: "white", textDecoration: "none" }}>Tutoriais</NavLink>
-
-            <NavLink to="/downloads" style={{ color: "white", textDecoration: "none" }}>Downloads</NavLink>
-
-            <NavLink to="/contato" style={{ color: "white", textDecoration: "none" }}>Contato</NavLink>
-
-            <NavLink to="/sobre" style={{ color: "white", textDecoration: "none" }}>Sobre</NavLink>
-
+          <nav style={{ display: "flex", gap: "4px" }}>
+            {[
+              { to: "/", label: "Home" },
+              { to: "/jogos", label: "Jogos" },
+              { to: "/tutoriais", label: "Tutoriais" },
+              { to: "/downloads", label: "Downloads" },
+              { to: "/contato", label: "Contato" },
+              { to: "/sobre", label: "Sobre" },
+            ].map(({ to, label }) => (
+              <NavLink key={to} to={to} style={({ isActive }) => ({
+                padding: "6px 14px",
+                fontSize: "11px",
+                letterSpacing: "2px",
+                textTransform: "uppercase",
+                color: isActive ? "#05050f" : "var(--text-muted)",
+                background: isActive ? "var(--accent)" : "transparent",
+                clipPath: "polygon(6px 0%, 100% 0%, calc(100% - 6px) 100%, 0% 100%)",
+                boxShadow: isActive ? "0 0 12px var(--glow)" : "none",
+                transition: "all 0.2s"
+              })}>
+                {label}
+              </NavLink>
+            ))}
           </nav>
-
         </header>
 
         <div style={{ display: "flex" }}>
 
-          <aside style={{ width: "250px", background: "#1a1a1a", padding: "20px" }}>
-
-            <h3>Menu</h3>
-
-            <ul style={{ listStyle: "none", padding: 0 }}>
-
-              <li style={{ padding: "8px 0" }}>
-                <NavLink
-                  to="/"
-                  style={({ isActive }) => ({
-                    color: isActive ? "red" : "white",
-                    textDecoration: "none",
-                    fontWeight: isActive ? "bold" : "normal"
-                  })}
-                >
-                  Home
-                </NavLink>
-              </li>
-
-              <li style={{ padding: "8px 0" }}>
-                <NavLink to="/jogos" style={({ isActive }) => ({
-                  color: isActive ? "red" : "white",
-                  textDecoration: "none",
-                  fontWeight: isActive ? "bold" : "normal"
-                })}>
-                  Videojogos
-                </NavLink>
-              </li>
-
-              <li style={{ padding: "8px 0" }}>
-                <NavLink to="/tutoriais" style={({ isActive }) => ({
-                  color: isActive ? "red" : "white",
-                  textDecoration: "none",
-                  fontWeight: isActive ? "bold" : "normal"
-                })}>
-                  Tutoriais
-                </NavLink>
-              </li>
-
-              <li style={{ padding: "8px 0" }}>
-                <NavLink to="/downloads" style={({ isActive }) => ({
-                  color: isActive ? "red" : "white",
-                  textDecoration: "none",
-                  fontWeight: isActive ? "bold" : "normal"
-                })}>
-                  Downloads
-                </NavLink>
-              </li>
-
-            </ul>
-
-            <h3 style={{ marginTop: "30px" }}>🔥 Jogos populares</h3>
-
-            <ul style={{ listStyle: "none", padding: 0 }}>
-
-              {popularGames.map((game, i) => (
-
-                <li key={i} style={{ padding: "6px 0" }}>
-
-                  <Link to={`/jogo/${game.id}`} style={{ color: "#ccc", textDecoration: "none" }}>{game.name}</Link>
-
+          <aside style={{
+            width: "220px",
+            minHeight: "calc(100vh - 70px)",
+            background: "var(--bg-sidebar)",
+            borderRight: "2px solid var(--border)",
+            padding: "24px 14px",
+            flexShrink: 0
+          }}>
+            <p className="section-title">Navegação</p>
+            <ul style={{ listStyle: "none", display: "flex", flexDirection: "column", gap: "2px" }}>
+              {[
+                { to: "/", label: "Home" },
+                { to: "/jogos", label: "Videojogos" },
+                { to: "/tutoriais", label: "Tutoriais" },
+                { to: "/downloads", label: "Downloads" },
+              ].map(({ to, label }) => (
+                <li key={to}>
+                  <NavLink to={to} style={({ isActive }) => ({
+                    display: "block",
+                    padding: "9px 12px",
+                    fontSize: "12px",
+                    letterSpacing: "2px",
+                    textTransform: "uppercase",
+                    color: isActive ? "var(--accent)" : "var(--text-muted)",
+                    borderLeft: isActive ? "3px solid var(--accent)" : "3px solid transparent",
+                    background: isActive ? "rgba(0,195,255,0.06)" : "transparent",
+                    textShadow: isActive ? "0 0 10px var(--glow)" : "none",
+                    transition: "all 0.2s"
+                  })}>
+                    {label}
+                  </NavLink>
                 </li>
-
               ))}
-
             </ul>
 
+            <p className="section-title" style={{ marginTop: "32px" }}>🔥 Populares</p>
+            <ul style={{ listStyle: "none", display: "flex", flexDirection: "column", gap: "10px" }}>
+              {popularGames.map((game, i) => (
+                <li key={i} style={{ display: "flex", alignItems: "center", gap: "8px" }}>
+                  <span style={{ color: "var(--accent2)", fontSize: "11px" }}>0{i + 1}</span>
+                  <Link to={`/jogo/${game.id}`} style={{
+                    color: "var(--text-muted)",
+                    fontSize: "12px",
+                    letterSpacing: "1px",
+                    textTransform: "uppercase"
+                  }}>
+                    {game.name}
+                  </Link>
+                </li>
+              ))}
+            </ul>
           </aside>
 
           <main style={{ flex: 1, padding: "20px" }}>
@@ -784,25 +697,23 @@ function App() {
 
         </div>
 
-        <footer
-          style={{
-            background: "#000",
-            marginTop: "40px",
-            padding: "20px",
-            textAlign: "center",
-            borderTop: "2px solid red"
-          }}
-        >
-
-          <p style={{ margin: 0 }}>
-            © {new Date().getFullYear()} MeuPS3
-          </p>
-
-          <p style={{ marginTop: 8, color: "#888" }}>
-            PlayStation 3 Community
-          </p>
-
-        </footer>
+        <footer style={{
+  background: "var(--bg-sidebar)",
+  borderTop: "2px solid var(--accent2)",
+  padding: "24px 30px",
+  display: "flex",
+  justifyContent: "space-between",
+  alignItems: "center",
+  boxShadow: "0 -4px 30px var(--glow2)"
+}}>
+  <div>
+    <p style={{ color: "var(--accent)", fontSize: "18px", letterSpacing: "4px", textShadow: "0 0 10px var(--glow)" }}>MEUSP3</p>
+    <p style={{ color: "var(--text-muted)", fontSize: "10px", letterSpacing: "3px", marginTop: "4px" }}>PLAYSTATION 3 FANSITE</p>
+  </div>
+  <p style={{ color: "var(--border)", fontSize: "11px", letterSpacing: "2px" }}>
+    © {new Date().getFullYear()} — TODOS OS DIREITOS RESERVADOS
+  </p>
+</footer>
 
       </div>
 

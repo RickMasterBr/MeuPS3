@@ -1,7 +1,3 @@
-body{
-  margin: 0;
-  font-family: 'Webslinger', sans-serif;
-}
 @font-face {
   font-family: 'Webslinger';
   src: url('./assets/WebslingerBold-z8eEX.ttf') format('truetype');
@@ -9,3 +5,84 @@ body{
   font-style: normal;
 }
 
+:root {
+  --bg: #05050f;
+  --bg-card: #0d0d1a;
+  --bg-sidebar: #080814;
+  --accent: #00c3ff;
+  --accent2: #7b2fff;
+  --glow: rgba(0, 195, 255, 0.4);
+  --glow2: rgba(123, 47, 255, 0.3);
+  --text: #e8e8ff;
+  --text-muted: #6060aa;
+  --border: #1a1a3a;
+  --radius: 4px;
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+  font-family: 'Webslinger', sans-serif;
+  background: var(--bg);
+  background-image:
+    repeating-linear-gradient(0deg, transparent, transparent 40px, rgba(0,195,255,0.02) 40px, rgba(0,195,255,0.02) 41px),
+    repeating-linear-gradient(90deg, transparent, transparent 40px, rgba(0,195,255,0.02) 40px, rgba(0,195,255,0.02) 41px);
+  color: var(--text);
+  min-height: 100vh;
+}
+
+a { color: inherit; text-decoration: none; }
+
+h1, h2, h3 {
+  font-family: 'Webslinger', sans-serif;
+  text-transform: uppercase;
+  letter-spacing: 2px;
+}
+
+/* SCROLLBAR */
+::-webkit-scrollbar { width: 6px; }
+::-webkit-scrollbar-track { background: var(--bg); }
+::-webkit-scrollbar-thumb { background: var(--accent2); border-radius: 3px; }
+
+/* SEÇÃO TÍTULO */
+.section-title {
+  font-size: 13px;
+  letter-spacing: 4px;
+  color: var(--accent);
+  text-transform: uppercase;
+  border-left: 3px solid var(--accent);
+  padding-left: 10px;
+  margin-bottom: 20px;
+  text-shadow: 0 0 10px var(--glow);
+}
+
+/* BOTÃO PADRÃO */
+.btn {
+  background: linear-gradient(135deg, var(--accent2), var(--accent));
+  border: none;
+  padding: 10px 22px;
+  color: white;
+  font-family: 'Webslinger', sans-serif;
+  font-size: 13px;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  cursor: pointer;
+  clip-path: polygon(8px 0%, 100% 0%, calc(100% - 8px) 100%, 0% 100%);
+  transition: opacity 0.2s;
+}
+.btn:hover { opacity: 0.85; }
+
+/* INPUT */
+.input {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-bottom: 2px solid var(--accent2);
+  padding: 10px 14px;
+  color: var(--text);
+  font-family: 'Webslinger', sans-serif;
+  font-size: 13px;
+  outline: none;
+  width: 100%;
+  max-width: 320px;
+}
+.input:focus { border-bottom-color: var(--accent); }
