@@ -81,24 +81,30 @@ const games = [
     id: "gta-vi",
     name: "Grand Theft Auto VI",
     image: "https://th.bing.com/th/id/R.1316de060b4f86a8b8019c0f94a33edb?rik=4wn9Z0E82BLTWQ&riu=http%3a%2f%2fwww.siradio.fm%2fupload%2fimages%2fgtasix.jpg&ehk=FVyrszz179KfCa9SkMSo%2bEPrABfSxRZS3ppfiEQvG4Y%3d&risl=&pid=ImgRaw&r=0",
-    genre: "Ação / Mundo aberto",
-    size: "18GB"
+    genres: ["Ação", "Mundo aberto"],
+    size: "18GB",
+    preco: "R$ 199,99",
+    descricao: "O tão aguardado GTA VI traz uma nova história, ambientada em Vice City, com gráficos aprimorados e um mundo mais vivo do que nunca."
   },
   {
     id: "the-last-of-us",
     name: "The Last of Us",
     image: "https://th.bing.com/th/id/OIP.0i7KLwJfCZIRbqocPqGPKQHaIf?w=156&h=180&c=7&r=0&o=7&pid=1.7&rm=3",
-    genre: "Ação / Survival",
-    size: "25GB"
+    genres: ["Ação", "Aventura"],
+    size: "25GB",
+    preco: "R$ 149,99",
+    descricao: "The Last of Us é um jogo de ação e aventura que segue a jornada de Joel e Ellie em um mundo pós-apocalíptico, enfrentando inimigos humanos e infectados."
   },
   {
     id: "god-of-war",
     name: "God of War",
     image: "https://th.bing.com/th/id/OIP.bpxOFTYdrmV5kYBy7-5N2gHaIe?w=144&h=180&c=7&r=0&o=7&pid=1.7&rm=3",
-    genre: "Hack and Slash",
-    size: "35GB"
-  },
-  {
+    genres: ["Hack and Slash", "Aventura"], 
+    size: "35GB",
+    preco: "R$ 179,99",
+    descricao: "God of War é um jogo de ação e aventura que segue a história de Kratos, um guerreiro espartano que enfrenta deuses e monstros da mitologia grega."
+  }
+  /* {
     id: "uncharted-3",
     name: "Uncharted 3",
     image: "https://tse1.mm.bing.net/th/id/OIP.mktX0_PL3tkW0zppHGQ2SwHaId?rs=1&pid=ImgDetMain&o=7&rm=3",
@@ -174,7 +180,7 @@ const games = [
     image: "https://th.bing.com/th/id/OIP.nLbtSUx8yzP4oM2FeNwVLgHaIj?w=128&h=180&c=7&r=0&o=7&pid=1.7&rm=3",
     genre: "Plataforma / Criativo",
     size: "8GB"
-  }
+  }*/
 ]
 
 const popularGames = [
@@ -224,6 +230,9 @@ const downloadList = [
 ]
 
 function Card({ id, title, image, category }) {
+
+  const [expanded, setExpanded] = useState(false)
+
   return (
     <Link to={`/post/${id}`}>
       <div style={{
@@ -231,22 +240,33 @@ function Card({ id, title, image, category }) {
         background: "var(--bg-card)",
         border: "1px solid var(--border)",
         borderBottom: "2px solid var(--accent2)",
-        overflow: "hidden",
         clipPath: "polygon(0 0, calc(100% - 12px) 0, 100% 12px, 100% 100%, 12px 100%, 0 calc(100% - 12px))",
         transition: "transform 0.2s, box-shadow 0.2s",
         cursor: "pointer"
       }}
         onMouseEnter={e => {
+          setExpanded(true)
           e.currentTarget.style.transform = "translateY(-4px)"
           e.currentTarget.style.boxShadow = "0 0 20px var(--glow2)"
         }}
         onMouseLeave={e => {
+          setExpanded(false)
           e.currentTarget.style.transform = "translateY(0)"
           e.currentTarget.style.boxShadow = "none"
         }}
       >
         <img src={image} style={{ width: "100%", height: "150px", objectFit: "cover", display: "block" }} />
         <div style={{ padding: "12px" }}>
+
+          <p style={{
+            opacity: expanded ? 1 : 0,
+            maxHeight: expanded ? "80px" : "0px",
+            overflow: "hidden",
+            transition: "max-height 0.8s ease, opacity 0.5s ease"
+          }}>
+            Conteudo ao ser expandido
+          </p>
+
           <p style={{ fontSize: "10px", color: "var(--accent2)", letterSpacing: "3px", marginBottom: "6px" }}>
             {category.toUpperCase()}
           </p>
@@ -299,6 +319,17 @@ function Jogos() {
   const [search, setSearch] = useState("")
   const filteredGames = games.filter(game => game.name.toLowerCase().includes(search.toLowerCase()))
 
+  const gamesByGenre = games.reduce((acc, game) => {
+
+    game.genres.forEach(genre => {
+      if (!acc[genre]) acc[genre] = []
+      acc[genre].push(game)
+    })
+    return acc
+  }, {})
+
+  
+
   return (
     <div>
       <p className="section-title">Jogos de PS3</p>
@@ -310,6 +341,34 @@ function Jogos() {
         value={search}
         onChange={(e) => setSearch(e.target.value)}
       />
+
+      {Object.keys(gamesByGenre).map(genre => (
+        <div key={genre}>
+        <p>{genre}</p>
+        <div style={{ display: "flex", gap: "16px" }}>
+          {gamesByGenre[genre].map((game, i) => (
+            <div key={i} style={{
+              width: "180px",
+              flexShrink: 0,
+              background: "var(--bg-card)",
+              border: "1px solid var(--border)",
+              borderBottom: "2px solid var(--accent)",
+              cursor: "pointer"
+            }}>
+              <img src={game.image} style={{ 
+                width: "180px", 
+                height: "252px", 
+                objectFit: "cover", 
+                display: "block" 
+              }} />
+              <div style={{ padding: "8px" }}>
+                <p style={{ fontSize: "11px", color: "var(--text)", letterSpacing: "1px" }}>{game.name}</p>
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+      ))}
 
       <div style={{ display: "flex", gap: "16px", flexWrap: "wrap", marginTop: "24px" }}>
         {filteredGames.map((game, i) => (
@@ -365,8 +424,8 @@ function Tutoriais() {
       <div style={{ display: "flex", gap: "20px", flexWrap: "wrap", marginTop: "24px" }}>
         {filteredPosts.length > 0
           ? filteredPosts.map((post, i) => (
-              <Card key={i} id={post.id} title={post.title} image={post.image} category={post.category} />
-            ))
+            <Card key={i} id={post.id} title={post.title} image={post.image} category={post.category} />
+          ))
           : <p style={{ color: "var(--text-muted)", letterSpacing: "2px", fontSize: "13px" }}>Nenhum tutorial encontrado.</p>
         }
       </div>
@@ -698,22 +757,22 @@ function App() {
         </div>
 
         <footer style={{
-  background: "var(--bg-sidebar)",
-  borderTop: "2px solid var(--accent2)",
-  padding: "24px 30px",
-  display: "flex",
-  justifyContent: "space-between",
-  alignItems: "center",
-  boxShadow: "0 -4px 30px var(--glow2)"
-}}>
-  <div>
-    <p style={{ color: "var(--accent)", fontSize: "18px", letterSpacing: "4px", textShadow: "0 0 10px var(--glow)" }}>MEUSP3</p>
-    <p style={{ color: "var(--text-muted)", fontSize: "10px", letterSpacing: "3px", marginTop: "4px" }}>PLAYSTATION 3 FANSITE</p>
-  </div>
-  <p style={{ color: "var(--border)", fontSize: "11px", letterSpacing: "2px" }}>
-    © {new Date().getFullYear()} — TODOS OS DIREITOS RESERVADOS
-  </p>
-</footer>
+          background: "var(--bg-sidebar)",
+          borderTop: "2px solid var(--accent2)",
+          padding: "24px 30px",
+          display: "flex",
+          justifyContent: "space-between",
+          alignItems: "center",
+          boxShadow: "0 -4px 30px var(--glow2)"
+        }}>
+          <div>
+            <p style={{ color: "var(--accent)", fontSize: "18px", letterSpacing: "4px", textShadow: "0 0 10px var(--glow)" }}>MEUSP3</p>
+            <p style={{ color: "var(--text-muted)", fontSize: "10px", letterSpacing: "3px", marginTop: "4px" }}>PLAYSTATION 3 FANSITE</p>
+          </div>
+          <p style={{ color: "var(--border)", fontSize: "11px", letterSpacing: "2px" }}>
+            © {new Date().getFullYear()} — TODOS OS DIREITOS RESERVADOS
+          </p>
+        </footer>
 
       </div>
 
